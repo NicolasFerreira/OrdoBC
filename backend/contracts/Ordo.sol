@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.26;
+pragma solidity 0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -87,7 +87,9 @@ contract Ordo is ERC721, Ownable {
 
     // Function to mint a new NFT
     function mintPrescription(address _to, bytes memory _encryptedDetails) external onlyDoctor {
-        require((getRoles(_to) == Roles.PATIENT), AddressToMintIsNotPatient(_to));
+        if((getRoles(_to) != Roles.PATIENT)){
+            revert AddressToMintIsNotPatient(_to);
+        }
         _tokenIdCounter++;
         uint256 tokenId = _tokenIdCounter;
         // Store prescription details

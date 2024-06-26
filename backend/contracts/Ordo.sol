@@ -111,17 +111,12 @@ contract Ordo is ERC721, Ownable {
     }
 
     // Function to get prescription details
-    function getPrescription(uint256 _tokenId) external onlyRegistred checkTokenExists(_tokenId) view returns (address, address, bytes memory, bool) {
+    function getPrescription(uint256 _tokenId) external onlyRegistred checkTokenExists(_tokenId) view returns (Prescription memory) {
         Prescription memory prescription = _prescriptions[_tokenId];
         if (users[msg.sender].role == Roles.PATIENT && msg.sender != prescription.patient) {
             revert GetPrescriptionUnauthorized();
         }
-        return (
-            prescription.doctor,
-            prescription.patient,
-            prescription.encryptedDetails,
-            prescription.treated
-        );
+        return prescription;
     }
 
     // Function to mark a prescription as treated

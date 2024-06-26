@@ -89,6 +89,12 @@ describe("Ordo", function () {
                 const ownerOrdo = await this.ordo.ownerOf(1);
                 expect(ownerOrdo).to.equal(this.addr3.address);
             });
+
+            it("should emit an event when an prescription is minted", async function () {
+                await expect(this.ordo.connect(this.addr1).mintPrescription(this.addr3.address, encryptedDetails))
+                    .to.emit(this.ordo, "PrescriptionMinted")
+                    .withArgs(1,this.addr1.address,this.addr3.address );
+            });
         });
 
         describe("Get Prescription", function () {

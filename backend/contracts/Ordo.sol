@@ -45,6 +45,11 @@ contract Ordo is ERC721, Ownable {
     // Mapping to store prescriptions
     mapping(uint256 => Prescription) private _prescriptions;
 
+    // Events
+    event UserRegistered(address indexed user, Roles role);
+    event PrescriptionMinted(uint256 indexed tokenId, address indexed doctor, address indexed patient);
+    event PrescriptionTreated(uint256 indexed tokenId);
+
     constructor() ERC721("Ordo", "ORDO") Ownable(msg.sender) {}
 
     // Modifier to restrict function access to doctors only
@@ -83,6 +88,7 @@ contract Ordo is ERC721, Ownable {
             role: _role,
             encryptedDatas: _encryptedDatas
         });
+        emit UserRegistered(_userAddress, _role);
     }
 
     // Function to mint a new NFT
@@ -101,6 +107,7 @@ contract Ordo is ERC721, Ownable {
         });
 
         _safeMint(_to, tokenId);
+        emit PrescriptionMinted(tokenId, msg.sender, _to);
     }
 
     // Function to get prescription details
@@ -124,6 +131,7 @@ contract Ordo is ERC721, Ownable {
             revert Unauthorized();
         }
         prescription.treated = true;
+        emit PrescriptionTreated(_tokenId);
     }
 
     // Function to set base URI for the NFTs
@@ -131,7 +139,7 @@ contract Ordo is ERC721, Ownable {
         return "https://api.example.com/metadata/";
     }
 
-    function getRoles(address _address) internal view returns (Roles) {
+    function getRoles(address _address) public view returns (Roles) {
         return users[_address].role;
     }
 }

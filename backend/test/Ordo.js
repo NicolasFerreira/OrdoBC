@@ -67,6 +67,14 @@ describe("Ordo", function () {
                     .withArgs(this.addr1.address, 1);
             });
         });
+
+        describe("Get User Role", function () {
+            it("should return role of an user address", async function () {
+                await this.ordo.registerUser(this.addr1.address, 1, encryptedData1);
+                const role = await this.ordo.getRole(this.addr1.address);
+                expect(role).to.equal(1);
+            });
+        });
     });
 
     describe("Ordonnance", function () {
@@ -141,6 +149,27 @@ describe("Ordo", function () {
                 Object.assign(this, await fixtureWithNFT(fixture));
             });
 
+            it("should fail if user is not pharmacist", async function () {
+                await expect(this.ordo.connect(this.addr1).markAsTreated(1))
+                    .to.be.revertedWithCustomError(this.ordo, "NotPharmacist");
+            });
+
+            it("should fail if token does not exist", async function () {
+                await expect(this.ordo.connect(this.addr2).markAsTreated(2))
+                   .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+            });
+
+            it("should update treated state of prescription", async function () {
+                await this.ordo.connect(this.addr2).markAsTreated(1);
+                const prescription = await this.ordo.connect(this.addr3).getPrescription(1);
+                expect(prescription[3]).to.be.true;
+            })
+
+            it("should emit an event when an prescription is treated", async function () {
+                await expect(this.ordo.connect(this.addr2).markAsTreated(1))
+                    .to.emit(this.ordo, "PrescriptionTreated")
+                    .withArgs(1);
+            });
 
         });
     })

@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 // Custom errors
     error NotDoctor();
-    error Unauthorized();
     error UserAlreadyRegistered();
     error UserNotRegistered();
     error NotRegistred();
@@ -93,7 +92,7 @@ contract Ordo is ERC721, Ownable {
 
     // Function to mint a new NFT
     function mintPrescription(address _to, bytes memory _encryptedDetails) external onlyDoctor {
-        if((getRoles(_to) != Roles.PATIENT)){
+        if((getRole(_to) != Roles.PATIENT)){
             revert AddressToMintIsNotPatient(_to);
         }
         _tokenIdCounter++;
@@ -122,9 +121,6 @@ contract Ordo is ERC721, Ownable {
     // Function to mark a prescription as treated
     function markAsTreated(uint256 _tokenId) external onlyPharmacist checkTokenExists(_tokenId) {
         Prescription storage prescription = _prescriptions[_tokenId];
-        if (msg.sender != prescription.doctor) {
-            revert Unauthorized();
-        }
         prescription.treated = true;
         emit PrescriptionTreated(_tokenId);
     }
@@ -134,7 +130,7 @@ contract Ordo is ERC721, Ownable {
         return "https://api.example.com/metadata/";
     }
 
-    function getRoles(address _address) public view returns (Roles) {
+    function getRole(address _address) public view returns (Roles) {
         return users[_address].role;
     }
 }

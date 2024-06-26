@@ -15,15 +15,23 @@ async function fixture() {
 }
 
 async function fixtureWithUsers() {
-    const [owner, addr1, addr2, addr3, addr4] = await ethers.getSigners();
+    const [owner, addr1, addr2, addr3, addr4, addr5] = await ethers.getSigners();
     const ordo = await ethers.deployContract("Ordo");
 
-    await ordo.registerUser(addr1.address, 1, encryptedData1);
-    await ordo.registerUser(addr2.address, 2, encryptedData2);
-    await ordo.registerUser(addr3.address, 3, encryptedData3);
+    await ordo.registerUser(addr1.address, 1, encryptedData1);// doctor
+    await ordo.registerUser(addr2.address, 2, encryptedData2);// pharma
+    await ordo.registerUser(addr3.address, 3, encryptedData3);// patient 1
+    await ordo.registerUser(addr4.address, 3, encryptedData3);// patient 2
 
-    return { owner, addr1, addr2, addr3, ordo, addr4 };
+    return { owner, addr1, addr2, addr3, ordo, addr4, addr5 };
 }
+
+async function fixtureWithNFT() {
+    const {owner, addr1, addr2, addr3, ordo, addr4, addr5} = await fixtureWithUsers();
+    await ordo.connect(addr1).mintPrescription(addr3.address, encryptedDetails);
+    return { owner, addr1, addr2, addr3, ordo, addr4, addr5 };
+}
+
 
 describe("Ordo", function () {
 
@@ -62,11 +70,13 @@ describe("Ordo", function () {
     });
 
     describe("Ordonnance", function () {
-        beforeEach(async function () {
-            Object.assign(this, await fixtureWithUsers(fixture));
-        });
+        
 
         describe("Mint Prescription", function () {
+            beforeEach(async function () {
+                Object.assign(this, await fixtureWithUsers(fixture));
+            });
+
             it("should fail if user is not doctor", async function () {
                 await expect(this.ordo.connect(this.addr2).mintPrescription(this.addr3.address, encryptedDetails))
                     .to.be.revertedWithCustomError(this.ordo, "NotDoctor");
@@ -98,10 +108,39 @@ describe("Ordo", function () {
         });
 
         describe("Get Prescription", function () {
+            beforeEach(async function () {
+                Object.assign(this, await fixtureWithNFT(fixture));
+            });
+
+            it("should fail if user is not registred", async function () {
+                await expect(this.ordo.connect(this.addr5).getPrescription(1))
+                    .to.be.revertedWithCustomError(this.ordo, "NotRegistred");
+            });
+
+            it("should fail if token does not exist", async function () {
+                await expect(this.ordo.connect(this.addr3).getPrescription(2))
+                   .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+            });
+
+            it("should fail if user is patient but not the owner of nft", async function () {
+                await expect(this.ordo.connect(this.addr4).getPrescription(1))
+                   .to.be.revertedWithCustomError(this.ordo, "GetPrescriptionUnauthorized");
+            });
+
+            it("should get a prescription", async function () {
+                await this.ordo.connect(this.addr3).getPrescription(1);
+                const prescription = await this.ordo.connect(this.addr3).getPrescription(1);
+                expect(prescription[0]).to.equal(this.addr1.address);
+                expect(prescription[1]).to.equal(this.addr3.address);
+            });
 
         });
 
         describe("Mark As Treated", function () {
+            beforeEach(async function () {
+                Object.assign(this, await fixtureWithNFT(fixture));
+            });
+
 
         });
     })

@@ -23,25 +23,27 @@ await Ordo.waitForDeployment();
   })
   const doctorData = stringToBytes(doctorString);
 
-//   const pharmacistData = hre.ethers.utils.formatBytes32String(JSON.stringify({
-//     name: "Pharmacist Jane Smith",
-//     pharmacy: "HealthPlus Pharmacy"
-//   }));
+  const pharmacistString= JSON.stringify({
+    name: "Pharmacist Jane Smith",
+    pharmacy: "HealthPlus Pharmacy"
+  });
+  const pharmacistData = stringToBytes(pharmacistString);
 
-//   const patientData = hre.ethers.utils.formatBytes32String(JSON.stringify({
-//     name: "Patient Bob Brown",
-//     dob: "1990-01-01",
-//     insurance: "123456789"
-//   }));
+  const patientString = JSON.stringify({
+    name: "Patient Bob Brown",
+    dob: "1990-01-01",
+    insurance: "123456789"
+  });
+  const patientData = stringToBytes(patientString);
 
   await Ordo.registerUser(doctor.address, 1, doctorData);
   console.log("Doctor registered:", doctor.address);
 
-//   await ordo.registerUser(pharmacist.address, 2, pharmacistData);
-//   console.log("Pharmacist registered:", pharmacist.address);
+  await Ordo.registerUser(pharmacist.address, 2, pharmacistData);
+  console.log("Pharmacist registered:", pharmacist.address);
 
-//   await ordo.registerUser(patient.address, 3, patientData);
-//   console.log("Patient registered:", patient.address);
+  await Ordo.registerUser(patient.address, 3, patientData);
+  console.log("Patient registered:", patient.address);
 }
 
 main()

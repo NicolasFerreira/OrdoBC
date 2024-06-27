@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
     error GetPrescriptionUnauthorized();
     error NotPharmacist();
     error AddressToMintIsNotPatient(address);
+    error SoulboundTransferFailed();
 
 contract Ordo is ERC721, Ownable {
     uint256 private _tokenIdCounter;
@@ -92,7 +93,7 @@ contract Ordo is ERC721, Ownable {
 
     // Function to mint a new NFT
     function mintPrescription(address _to, bytes memory _encryptedDetails) external onlyDoctor {
-        if((getRole(_to) != Roles.PATIENT)){
+        if(getRole(_to) != Roles.PATIENT){
             revert AddressToMintIsNotPatient(_to);
         }
         _tokenIdCounter++;
@@ -132,5 +133,23 @@ contract Ordo is ERC721, Ownable {
 
     function getRole(address _address) public view returns (Roles) {
         return users[_address].role;
+    }
+
+    /**
+     * @dev Internal function to handle token transfers.
+     * Restricts the transfer of Soulbound tokens.
+     */
+
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721)
+        returns (address)
+    {
+        address from = _ownerOf(tokenId);
+        if (from != address(0) && to != address(0)) {
+            revert SoulboundTransferFailed();
+        }
+
+        return super._update(to, tokenId, auth);
     }
 }

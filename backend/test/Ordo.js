@@ -172,6 +172,22 @@ describe("Ordo", function () {
             });
 
         });
+
+        describe("Transfer", function () {
+            beforeEach(async function () {
+                Object.assign(this, await fixtureWithNFT(fixture));
+            });
+
+            it("should fail if user try to transfer", async function () {
+                await expect(this.ordo.connect(this.addr3).transferFrom(this.addr3.address, this.addr4.address, 1))
+                    .to.be.revertedWithCustomError(this.ordo, "SoulboundTransferFailed");
+            });
+
+            it("should fail if token does not exist", async function () {
+                await expect(this.ordo.connect(this.addr3).transferFrom(this.addr3.address, this.addr4.address, 2))
+                   .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+            });
+        })
     })
 
 });

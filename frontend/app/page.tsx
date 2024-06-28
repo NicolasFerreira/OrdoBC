@@ -1,8 +1,11 @@
 'use client'
 import { useState, useEffect } from "react";
+import { useGetRole } from "@/hooks/useContract";
+
 export default function Home() {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
+  const { role, loadingRole, refetchRole } = useGetRole();
 
   const test = async () => {
     setLoading(true);
@@ -25,7 +28,7 @@ export default function Home() {
 
   return (
     <main>
-      <button onClick={test} className=" font-bold">Test api btn</button>
+      <button onClick={test} className=" font-bold">Test api btn {role}</button>
     </main>
   );
 }

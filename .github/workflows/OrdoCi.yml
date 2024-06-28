@@ -29,7 +29,8 @@ jobs:
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: |
-          cd backend && npm ci
+          cd backend
+          npm ci
 
       - name: Run Tests
         run: 

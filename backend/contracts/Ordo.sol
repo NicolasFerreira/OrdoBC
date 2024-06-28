@@ -5,14 +5,14 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 // Custom errors
-    error NotDoctor();
-    error UserAlreadyRegistered();
-    error UserNotRegistered();
-    error NotRegistred();
-    error GetPrescriptionUnauthorized();
-    error NotPharmacist();
-    error AddressToMintIsNotPatient(address);
-    error SoulboundTransferFailed();
+error NotDoctor();
+error UserAlreadyRegistered();
+error UserNotRegistered();
+error NotRegistred();
+error GetPrescriptionUnauthorized();
+error NotPharmacist();
+error AddressToMintIsNotPatient(address);
+error SoulboundTransferFailed();
 
 contract Ordo is ERC721, Ownable {
     uint256 private _tokenIdCounter;
@@ -50,9 +50,14 @@ contract Ordo is ERC721, Ownable {
     event PrescriptionMinted(uint256 indexed tokenId, address indexed doctor, address indexed patient);
     event PrescriptionTreated(uint256 indexed tokenId);
 
+    /**
+     * @dev Constructor to initialize the contract with a name and symbol for the NFT.
+     */
     constructor() ERC721("Ordo", "ORDO") Ownable(msg.sender) {}
 
-    // Modifier to restrict function access to doctors only
+    /**
+     * @dev Modifier to restrict access to functions to only doctors.
+     */
     modifier onlyDoctor() {
         if (users[msg.sender].role != Roles.DOCTOR) {
             revert NotDoctor();
@@ -60,26 +65,42 @@ contract Ordo is ERC721, Ownable {
         _;
     }
 
-    modifier onlyRegistred(){
-         if (users[msg.sender].role == Roles.UNKNOWN) {
+    /**
+     * @dev Modifier to restrict access to functions to only registered users.
+     */
+    modifier onlyRegistred() {
+        if (users[msg.sender].role == Roles.UNKNOWN) {
             revert NotRegistred();
         }
         _;
     }
 
+    /**
+     * @dev Modifier to restrict access to functions to only pharmacists.
+     */
     modifier onlyPharmacist() {
-         if (users[msg.sender].role != Roles.PHARMACIST) {
+        if (users[msg.sender].role != Roles.PHARMACIST) {
             revert NotPharmacist();
         }
         _;
     }
 
+    /**
+     * @dev Modifier to check if a token exists.
+     * @param _tokenId The ID of the token to check.
+     */
     modifier checkTokenExists(uint256 _tokenId) {
         _requireOwned(_tokenId);
         _;
     }
 
-    // Function to register a new user
+    /**
+     * @dev Registers a new user with a specified role and encrypted data.
+     * @param _userAddress The address of the user to register.
+     * @param _role The role of the user (DOCTOR, PHARMACIST, PATIENT).
+     * @param _encryptedDatas The encrypted data of the user.
+     * Emits a {UserRegistered} event.
+     */
     function registerUser(address _userAddress, Roles _role, bytes memory _encryptedDatas) external onlyOwner {
         if (users[_userAddress].role != Roles.UNKNOWN) {
             revert UserAlreadyRegistered();
@@ -91,7 +112,12 @@ contract Ordo is ERC721, Ownable {
         emit UserRegistered(_userAddress, _role);
     }
 
-    // Function to mint a new NFT
+    /**
+     * @dev Mints a new prescription NFT for a patient.
+     * @param _to The address of the patient.
+     * @param _encryptedDetails The encrypted details of the prescription.
+     * Emits a {PrescriptionMinted} event.
+     */
     function mintPrescription(address _to, bytes memory _encryptedDetails) external onlyDoctor {
         if(getRole(_to) != Roles.PATIENT){
             revert AddressToMintIsNotPatient(_to);
@@ -110,7 +136,11 @@ contract Ordo is ERC721, Ownable {
         emit PrescriptionMinted(tokenId, msg.sender, _to);
     }
 
-    // Function to get prescription details
+    /**
+     * @dev Retrieves the details of a prescription.
+     * @param _tokenId The ID of the prescription token.
+     * @return The details of the prescription.
+     */
     function getPrescription(uint256 _tokenId) external onlyRegistred checkTokenExists(_tokenId) view returns (Prescription memory) {
         Prescription memory prescription = _prescriptions[_tokenId];
         if (users[msg.sender].role == Roles.PATIENT && msg.sender != prescription.patient) {
@@ -119,18 +149,30 @@ contract Ordo is ERC721, Ownable {
         return prescription;
     }
 
-    // Function to mark a prescription as treated
+    /**
+     * @dev Marks a prescription as treated.
+     * @param _tokenId The ID of the prescription token.
+     * Emits a {PrescriptionTreated} event.
+     */
     function markAsTreated(uint256 _tokenId) external onlyPharmacist checkTokenExists(_tokenId) {
         Prescription storage prescription = _prescriptions[_tokenId];
         prescription.treated = true;
         emit PrescriptionTreated(_tokenId);
     }
 
-    // Function to set base URI for the NFTs
+    /**
+     * @dev Sets the base URI for the NFTs.
+     * @return The base URI as a string.
+     */
     function _baseURI() internal pure override returns (string memory) {
         return "https://api.example.com/metadata/";
     }
 
+    /**
+     * @dev Retrieves the role of a specified address.
+     * @param _address The address to check.
+     * @return The role of the address.
+     */
     function getRole(address _address) public view returns (Roles) {
         return users[_address].role;
     }
@@ -138,8 +180,11 @@ contract Ordo is ERC721, Ownable {
     /**
      * @dev Internal function to handle token transfers.
      * Restricts the transfer of Soulbound tokens.
+     * @param to The address to transfer the token to.
+     * @param tokenId The ID of the token to transfer.
+     * @param auth The address that authorized the transfer.
+     * @return The address of the new owner.
      */
-
     function _update(address to, uint256 tokenId, address auth)
         internal
         override(ERC721)

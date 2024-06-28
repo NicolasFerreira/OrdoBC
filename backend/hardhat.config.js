@@ -3,7 +3,7 @@ require('@openzeppelin/hardhat-upgrades');
 const { vars } = require("hardhat/config");
 
 const PRIVATE_KEY = vars.get("PRIVATE_KEY","");
-const BASESCAN_API_KEY = vars.get("BASESCAN_API_KEY","O26JPE0T3VXSZXH6MJ8I7FNFMR7FZYJJ");
+const BASESCAN_API_KEY = vars.get("BASESCAN_API_KEY","0x706174617465646f756365");
 
 
 /** @type import('hardhat/config').HardhatUserConfig */

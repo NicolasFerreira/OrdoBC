@@ -4,7 +4,7 @@ const networkName = hre.network.name;
 // Function to convert a string to bytes
 function stringToBytes(inputString) {
   return hre.ethers.hexlify(hre.ethers.toUtf8Bytes(inputString));
-}   
+}    
 
 async function main() {
   // Get the contract to deploy

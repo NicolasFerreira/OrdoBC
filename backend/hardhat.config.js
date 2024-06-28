@@ -2,8 +2,8 @@ require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
 const { vars } = require("hardhat/config");
 
-const PRIVATE_KEY = vars.get("PRIVATE_KEY") || "";
-const BASESCAN_API_KEY = vars.get("BASESCAN_API_KEY") || "";
+const PRIVATE_KEY = vars.get("PRIVATE_KEY","");
+const BASESCAN_API_KEY = vars.get("BASESCAN_API_KEY","");
 
 
 /** @type import('hardhat/config').HardhatUserConfig */

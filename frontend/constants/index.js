@@ -1,4 +1,4 @@
-export const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const contractAddress = process.env.NODE_ENV === "production" ? "0x2520E205A7d9b8F76B6Ebcf7e2401928Ec207F3e" : "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 export const contractAbi = [
 	{

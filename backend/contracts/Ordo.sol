@@ -4,6 +4,8 @@ pragma solidity 0.8.24;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+
+
 // Custom errors
 error NotDoctor();
 error UserAlreadyRegistered();
@@ -31,14 +33,14 @@ contract Ordo is ERC721, Ownable {
     // Struct to define user data
     struct User {
         Roles role;
-        bytes encryptedDatas;
+        string encryptedDatas;
     }
 
     // Struct to define prescription data
     struct Prescription {
         address doctor;
         address patient;
-        bytes encryptedDetails;
+        string encryptedDetails;
         bool treated;
     }
 
@@ -101,7 +103,7 @@ contract Ordo is ERC721, Ownable {
      * @param _encryptedDatas The encrypted data of the user.
      * Emits a {UserRegistered} event.
      */
-    function registerUser(address _userAddress, Roles _role, bytes memory _encryptedDatas) external onlyOwner {
+    function registerUser(address _userAddress, Roles _role, string memory _encryptedDatas) external onlyOwner {
         if (users[_userAddress].role != Roles.UNKNOWN) {
             revert UserAlreadyRegistered();
         }
@@ -118,7 +120,7 @@ contract Ordo is ERC721, Ownable {
      * @param _encryptedDetails The encrypted details of the prescription.
      * Emits a {PrescriptionMinted} event.
      */
-    function mintPrescription(address _to, bytes memory _encryptedDetails) external onlyDoctor {
+    function mintPrescription(address _to, string memory _encryptedDetails) external onlyDoctor {
         if(getRole(_to) != Roles.PATIENT){
             revert AddressToMintIsNotPatient(_to);
         }

@@ -10,7 +10,7 @@ const dataToEncrypt = { field1: "value1", field2: 12345 };
 const privateKey = process.env.ENCRYPTION_KEY; 
 
 export const encrypt = (dataToEncrypt) => {
-    console.log("to encrypt", dataToEncrypt)
+    console.log("to encrypt", dataToEncrypt, privateKey)
     try {
         const encryptedData = AES.encrypt(JSON.stringify(dataToEncrypt), privateKey).toString();
         console.log(encryptedData)

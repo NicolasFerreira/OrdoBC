@@ -6,7 +6,10 @@ const nextConfig = {
         return config;
       },
       env: {
+        APP_URL: process.env.APP_URL,
         CLOUD_WALLET_KEY: process.env.CLOUD_WALLET_KEY,
-      }
+        ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+      },
+      reactStrictMode: false,
 };
 export default nextConfig;

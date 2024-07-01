@@ -1,0 +1,26 @@
+{
+    "prescriptionId": "RX123456789",
+    "patientId": "PAT67890",
+    "doctorId": "DOC12345",
+    "pharmacistId": "PHAR12345",
+    "dateIssued": "2024-06-12",
+    "medications": [
+      {
+        "name": "Metformin",
+        "dosage": "500 mg",
+        "frequency": "Twice daily",
+        "duration": "30 days"
+      },
+      {
+        "name": "Lisinopril",
+        "dosage": "20 mg",
+        "frequency": "Once daily",
+        "duration": "30 days"
+      }
+    ],
+    "notes": "Take medications with food.",
+    "refill": {
+      "allowed": true,
+      "quantity": 1
+    }
+  }

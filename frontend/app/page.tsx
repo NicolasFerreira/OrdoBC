@@ -40,6 +40,7 @@ export default  function Home() {
         "quantity": 1
       }
     }
+    console.log('data to encrypt',jsondata)
      const result = await encryptApi(jsondata);
      await writeMintPrescription(addressPatient, result.encryptedData)
   }

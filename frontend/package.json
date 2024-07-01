@@ -11,6 +11,7 @@
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.1.2",
     "@tanstack/react-query": "^5.48.0",
+    "crypto-js": "^4.2.0",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18",

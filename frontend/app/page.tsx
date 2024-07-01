@@ -1,34 +1,88 @@
 'use client'
-import { useState, useEffect } from "react";
-import { useGetRole } from "@/hooks/useContract";
+import { useState, useEffect, useContext , use} from "react";
+import { redirect } from 'next/navigation';
+import Link from "next/link"
+import { useGetRole , useMintPrescription , encryptApi} from "@/hooks/useContract";
+import { Prescription } from "@/types/ordoTypes";
 
-export default function Home() {
+
+export default  function Home() {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
-  const { role, loadingRole, refetchRole } = useGetRole();
+  const [addressPatient, setAddressPatient] = useState("0x90F79bf6EB2c4f870365E785982E1f101E93b906");
+  const { loadingRole, isRegistered, isDoctor, isPatient, isPharmacist } = useGetRole();
+  const { writeMintPrescription } = useMintPrescription()
 
-  const test = async () => {
-    setLoading(true);
-    const response = await fetch('http://localhost:3000/api');
-    const dataFromApi = await response.json();
-    setData(dataFromApi);
-    setLoading(false);
+  const handleMint = async () => {
+     let jsondata = {
+      "prescriptionId": "RX123456789",
+      "patientId": "PAT67890",
+      "doctorId": "DOC12345",
+      "pharmacistId": "PHAR12345",
+      "dateIssued": "2024-06-12",
+      "medications": [
+        {
+          "name": "Metformin",
+          "dosage": "500 mg",
+          "frequency": "Twice daily",
+          "duration": "30 days"
+        },
+        {
+          "name": "Lisinopril",
+          "dosage": "20 mg",
+          "frequency": "Once daily",
+          "duration": "30 days"
+        }
+      ],
+      "notes": "Take medications with food.",
+      "refill": {
+        "allowed": true,
+        "quantity": 1
+      }
+    }
+     const result = await encryptApi(jsondata);
+     await writeMintPrescription(addressPatient, result.encryptedData)
   }
 
-  useEffect(() => {
-  
-  }, []);
+  if (loadingRole) {
+    return <p>Chargement...</p>
+  }
 
-  useEffect(() => {
-    if (Object.keys(data).length > 0) { // Vérifie si data n'est pas vide
-      console.log('Updated data:', data); // Log les données mises à jour
-    }
-  }, [data]);
+  if (!isRegistered) {
+    return <p>Vous n'etes pas enregistré</p>
+  }
+
+  if (isDoctor) {
+    return (
+      <>
+      <div>
+        <input id="address"
+                    value={addressPatient}
+                    onChange={(e) => setAddressPatient(e.target.value)}
+                    placeholder="x0..."/>
+        <button onClick={handleMint}>Nouvelle Ordonnance</button>
+      </div>
+       
+
+      </>
+    )
+  }
+
+  if (isPatient) {
+    return (
+      <>
+        <div>Page Profil Patient</div>
+      </>
+    )
+  }
+
+  if (isPharmacist) {
+    return (
+      <>
+        <div>Page Profil Pharmacien</div>
+      </>
+    )
+  }
 
 
-  return (
-    <main>
-      <button onClick={test} className=" font-bold">Test api btn dev to main {role}</button>
-    </main>
-  );
 }

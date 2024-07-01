@@ -33,18 +33,6 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const encryptedData = searchParams.get('encryptedData')
-
-
-  console.log(encryptedData)
-  const decryptedData = decrypt(encryptedData as string);
-  const data =  {test: decryptedData}
-  
- 
-  return Response.json({ data })
-}
 
 
 

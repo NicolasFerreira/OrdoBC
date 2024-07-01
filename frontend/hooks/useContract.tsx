@@ -12,6 +12,7 @@ export async function encryptApi(dataToEncrypt: any) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ data: dataToEncrypt, action: 'encrypt' }),
+      cache: 'no-store' 
     });
     const result = await response.json();
     console.log('Encrypted data:', result.encryptedData);
@@ -29,6 +30,7 @@ async function decryptApi(encryptedData: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ data: encryptedData, action: 'decrypt' }),
+      cache: 'no-store'
     });
     const result = await response.json();
     console.log('Decrypted data:', result.decryptedData);

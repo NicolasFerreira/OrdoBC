@@ -1,27 +1,31 @@
 import { headers } from 'next/headers'
 import { encrypt, decrypt } from './encryption';
-// export async function GET(request: Request) {
-//   const headersList = headers()
-//   const referer = headersList.get('referer')
-//   // if (!referer?.includes(process.env.APP_URL as string)) {
-//   //   return Response.json({ 
-//   //     message: 'Unauthorized',
-//   //     ref:referer
-//   //    }, { status: 401 });
-//   // }
+export async function GET(request: Request) {
+  const headersList = headers()
+  const referer = headersList.get('referer')
+  if (!referer?.includes(process.env.APP_URL as string)) {
+    return Response.json({ 
+      message: 'Unauthorized',
+      ref:referer
+     }, { status: 401 });
+  }
+ 
+   return Response.json({ message: "no get return" });
 
-//    //decrypt
-//    const { searchParams } = new URL(request.url)
-//      const encryptedData = searchParams.get('encryptedData')
-
-//    const decryptedData = decrypt(encryptedData as string);
-//    return Response.json({ decryptedData: JSON.parse(decryptedData) });
-
-// }
+}
 
 export async function POST(request: Request) {
-  const { data, action } = await request.json();
+  
+  const headersList = headers()
+  const referer = headersList.get('referer')
+  if (!referer?.includes(process.env.APP_URL as string)) {
+    return Response.json({ 
+      message: 'Unauthorized',
+      ref:referer
+     }, { status: 401 });
+  }
 
+  const { data, action } = await request.json();
   switch (action) {
     case 'encrypt':
       return Response.json({ encryptedData: encrypt(data) });

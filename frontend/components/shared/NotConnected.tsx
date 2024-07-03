@@ -9,7 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 const NotConnected = () => {
   return (
     <div className="w-full grid lg:grid-cols-2 h-screen ">
-        <div className="flex justify-center item-center hidden bg-muted lg:flex bg-[#0e76fd] ">
+        <div className="flex justify-center item-center hidden  lg:flex bg-[#0e76fd] ">
         {/* <Image
           src="/home_img.png"
           alt="Image"

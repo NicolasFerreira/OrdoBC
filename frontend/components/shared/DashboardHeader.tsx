@@ -2,10 +2,11 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import React from "react";
 
-const Header = () => {
+const DashboardHeader = () => {
   return (
     <nav className="navbar">
-      <Link href={"/"} className="grow text-2xl font-semibold">OrdoBC</Link>
+      {/* <Link href={"/"} className="grow text-2xl font-semibold">OrdoBC</Link> */}
+      <div></div>
       <div>
         <ConnectButton 
           accountStatus="address"
@@ -18,4 +19,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default DashboardHeader;

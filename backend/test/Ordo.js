@@ -27,7 +27,7 @@ async function fixtureWithUsers() {
 }
 
 async function fixtureWithNFT() {
-    const {owner, addr1, addr2, addr3, ordo, addr4, addr5} = await fixtureWithUsers();
+    const { owner, addr1, addr2, addr3, ordo, addr4, addr5 } = await fixtureWithUsers();
     await ordo.connect(addr1).mintPrescription(addr3.address, encryptedDetails);
     return { owner, addr1, addr2, addr3, ordo, addr4, addr5 };
 }
@@ -64,7 +64,7 @@ describe("Ordo", function () {
             it("should emit an event when an user is registered", async function () {
                 await expect(this.ordo.registerUser(this.addr1.address, 1, encryptedData1))
                     .to.emit(this.ordo, "UserRegistered")
-                    .withArgs(this.addr1.address, 1);
+                    .withArgs(this.addr1.address, 1, encryptedData1);
             });
         });
 
@@ -78,7 +78,7 @@ describe("Ordo", function () {
     });
 
     describe("Ordonnance", function () {
-        
+
 
         describe("Mint Prescription", function () {
             beforeEach(async function () {
@@ -109,9 +109,14 @@ describe("Ordo", function () {
             });
 
             it("should emit an event when an prescription is minted", async function () {
-                await expect(this.ordo.connect(this.addr1).mintPrescription(this.addr3.address, encryptedDetails))
+                const tx = await this.ordo.connect(this.addr1).mintPrescription(this.addr3.address, encryptedDetails);
+                const receipt = await tx.wait();
+                const block = await ethers.provider.getBlock(receipt.blockNumber);
+                const timestamp = block.timestamp;
+
+                await expect(tx)
                     .to.emit(this.ordo, "PrescriptionMinted")
-                    .withArgs(1,this.addr1.address,this.addr3.address );
+                    .withArgs(1, this.addr1.address, this.addr3.address, encryptedDetails, timestamp);
             });
         });
 
@@ -127,12 +132,12 @@ describe("Ordo", function () {
 
             it("should fail if token does not exist", async function () {
                 await expect(this.ordo.connect(this.addr3).getPrescription(2))
-                   .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+                    .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
             });
 
             it("should fail if user is patient but not the owner of nft", async function () {
                 await expect(this.ordo.connect(this.addr4).getPrescription(1))
-                   .to.be.revertedWithCustomError(this.ordo, "GetPrescriptionUnauthorized");
+                    .to.be.revertedWithCustomError(this.ordo, "GetPrescriptionUnauthorized");
             });
 
             it("should get a prescription", async function () {
@@ -156,7 +161,7 @@ describe("Ordo", function () {
 
             it("should fail if token does not exist", async function () {
                 await expect(this.ordo.connect(this.addr2).markAsTreated(2))
-                   .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+                    .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
             });
 
             it("should update treated state of prescription", async function () {
@@ -185,7 +190,7 @@ describe("Ordo", function () {
 
             it("should fail if token does not exist", async function () {
                 await expect(this.ordo.connect(this.addr3).transferFrom(this.addr3.address, this.addr4.address, 2))
-                   .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+                    .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
             });
         })
     })

@@ -40,14 +40,15 @@ contract Ordo is ERC721, Ownable {
         address patient;
         string encryptedDetails;
         bool treated;
+        uint256 date_created;
     }
 
     // Mapping to store prescriptions
     mapping(uint256 => Prescription) private _prescriptions;
 
     // Events
-    event UserRegistered(address indexed user, Roles role);
-    event PrescriptionMinted(uint256 indexed tokenId, address indexed doctor, address indexed patient);
+    event UserRegistered(address indexed user, Roles role, string encryptedDatas);
+    event PrescriptionMinted(uint256 indexed tokenId, address indexed doctor, address indexed patient, string encryptedDetails, uint256 date_created);
     event PrescriptionTreated(uint256 indexed tokenId);
 
     /**
@@ -109,7 +110,7 @@ contract Ordo is ERC721, Ownable {
             role: _role,
             encryptedDatas: _encryptedDatas
         });
-        emit UserRegistered(_userAddress, _role);
+        emit UserRegistered(_userAddress, _role, _encryptedDatas);
     }
 
     /**
@@ -129,11 +130,13 @@ contract Ordo is ERC721, Ownable {
             doctor: msg.sender,
             patient: _to,
             encryptedDetails: _encryptedDetails,
-            treated: false
+            treated: false,
+            date_created: block.timestamp
         });
 
         _safeMint(_to, tokenId);
-        emit PrescriptionMinted(tokenId, msg.sender, _to);
+        
+        emit PrescriptionMinted(tokenId, msg.sender, _to, _encryptedDetails, block.timestamp);
     }
 
     /**

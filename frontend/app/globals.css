@@ -87,7 +87,7 @@ body {
 }
 
 .navbar {
-  @apply flex-between p-3;
+  @apply flex-between py-3;
 }
 
 .main {

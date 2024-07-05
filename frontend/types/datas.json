@@ -1,0 +1,25 @@
+{
+    "headerTable":[
+    {"label":"N° prescription", "className":"w-[100px]"},
+    {"label":"Nom Patient", "className":""},
+    {"label":"Date de prescription", "className":""},
+    {"label":"Status", "className":"w-[100px]"}
+  ],
+    "bodyTable":[{
+      "id":"1",
+      "patient":"John Doe",
+      "date":"2022-05-15",
+      "status":"En cours"
+    },{
+      "id":"2",
+      "patient":"Jane Doe",
+      "date":"2022-05-16",
+      "status":"Terminée"
+    },{
+      "id":"3",
+      "patient":"Mary Doe",
+      "date":"2022-05-17",
+      "status":"En attente"
+    }
+  ]
+   }

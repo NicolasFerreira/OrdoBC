@@ -22,7 +22,7 @@ export async function encryptApi(dataToEncrypt: any) {
   }
 }
 
-async function decryptApi(encryptedData: string) {
+export async function decryptApi(encryptedData: string) {
   try {
     const response = await fetch('/api', {
       method: 'POST',

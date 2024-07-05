@@ -43,12 +43,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </Dashboard>
     )
   }
-  // Si une connextion est en cours
-  // if(isConnecting || isReconnecting) {
-  //   return (
-  //     <Spinner/>
-  //   )
-  // }
+  // Si refresh page 
+  if( isReconnecting) {
+    return (
+      <Spinner/>
+    )
+  }
   // Si aucune connexion n'est établie, renvoyer le composant NotConnected
   return (
     loading ? <Spinner/> : <NotConnected/>

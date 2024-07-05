@@ -24,7 +24,7 @@ const DashboardAside:React.FC<DashboardAsideProps> = ({role})=> {
        if (role?.toString() ==="0"){
         setNav([])
        }
-    }, [])
+    }, [role])
 
     
   return (

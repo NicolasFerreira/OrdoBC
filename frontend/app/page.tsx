@@ -206,7 +206,7 @@ interface TablePrescriptionsProps {
   headerTable: HeaderTable[];
   bodyTable: BodyTable[];
 }
-export function TablePrescriptions({ headerTable, bodyTable }: TablePrescriptionsProps) {
+function TablePrescriptions({ headerTable, bodyTable }: TablePrescriptionsProps) {
   const router = useRouter()
   return (
     <Table>

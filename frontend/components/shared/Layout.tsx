@@ -16,7 +16,7 @@ interface LayoutProps {
 // Utiliser l'interface pour typer le composant
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { isConnected, address, isReconnecting, isConnecting } = useAccount();
-  const { isRegistered, refetchRole, role } = useGetRole();
+  const { isRegistered, refetchRole, role, loadingRole } = useGetRole();
   const [loading, setLoading] = useState(true)
   const pathname = usePathname()
   // useEffect(() => {
@@ -39,7 +39,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   if(isConnected) {
     return (
         <Dashboard role={role}>
-          {children}
+          {!loadingRole ? children : <Spinner/>}
         </Dashboard>
     )
   }

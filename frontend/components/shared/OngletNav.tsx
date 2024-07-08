@@ -32,18 +32,18 @@ interface OngletNavProps {
 
 const OngletNav: React.FC<OngletNavProps> = ({ link, icons, textTooltip }) => {
     const pathname = usePathname()
-    const [classIcon, setClassIcon] = useState("")
-    let classBase = "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8 "
-    let classActive = "text-accent-foreground"
+    // const [classIcon, setClassIcon] = useState("")
+    // let classBase = "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8 "
+    // let classActive = "text-accent-foreground"
 
     useEffect(() => {
-        setClassIcon(classBase)
+        //setClassIcon(classBase)
     }, [])
 
     useEffect(() => {
-        if (pathname === link) {
-            setClassIcon(`${classBase} ${classActive}`)
-        }
+        // if (pathname === link) {
+        //     //setClassIcon(`${classBase} ${classActive}`)
+        // }
     }, [pathname])
 
     const getIcon = (icon: string) => {
@@ -76,18 +76,6 @@ const OngletNav: React.FC<OngletNavProps> = ({ link, icons, textTooltip }) => {
 
 
     return (
-        // <Tooltip>
-        //     <TooltipTrigger asChild>
-        //         <Link
-        //             href={link}
-        //             className={classIcon}
-        //             >
-        //             {getIcon(icons)}
-        //             <span className="sr-only">{textTooltip}</span>
-        //         </Link>
-        //     </TooltipTrigger>
-        //     <TooltipContent side="right">{textTooltip}</TooltipContent>
-        // </Tooltip>
         <Link
             href={link}
             className="flex items-center gap-3 rounded-lg text-sm px-3 py-2 text-muted-foreground transition-all hover:text-primary"

@@ -38,41 +38,51 @@ import {
 import {
 
   PlusCircle,
-
+  Trash
 } from "lucide-react"
 import { Label } from "@/components/ui/label";
+import { BtnModalMedic } from "@/components/shared/BtnModalMedic";
+import { publicClient } from "@/utils/client";
+import { contractAddress } from "@/constants";
 
-
+interface Medicament {
+  name: string;
+  posology: string;
+}
 
 export default function Page() {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
   const [addressPatient, setAddressPatient] = useState("0x90F79bf6EB2c4f870365E785982E1f101E93b906");
   const { loadingRole, isRegistered, isDoctor, isPatient, isPharmacist } = useGetRole();
-  const { writeMintPrescription } = useMintPrescription()
+  const { writeMintPrescription, isConfirmedMint } = useMintPrescription();
+
+  const [medicaments, setMedicaments] = useState<Medicament[]>([])
+
+  const handleAddMedicament = (name: string, posology: string) => {
+    const newMedicament = { name: name, posology: posology }
+    setMedicaments([...medicaments, newMedicament])
+  }
+
+  const handleRemoveMedicament = (index: number) => {
+    setMedicaments(medicaments.filter((_, i) => i !== index));
+  }
+
+  const getDoctorInfos = () => {
+
+  }
 
   const handleMint = async () => {
     let jsondata = {
-      "prescriptionId": "RX123456789",
-      "patientId": "PAT67890",
-      "doctorId": "DOC12345",
-      "pharmacistId": "PHAR12345",
-      "dateIssued": "2024-06-12",
-      "medications": [
-        {
-          "name": "Metformin",
-          "dosage": "500 mg",
-          "frequency": "Twice daily",
-          "duration": "30 days"
-        },
-        {
-          "name": "Lisinopril",
-          "dosage": "20 mg",
-          "frequency": "Once daily",
-          "duration": "30 days"
-        }
-      ],
-      "notes": "Take medications with food.",
+      "patient": {
+        name:"",
+        address: "",
+        date_naissance:"01/10/1990"
+      },
+      "doctor": {
+      },
+      "medications": medicaments,
+      "notes": "",
       "refill": {
         "allowed": true,
         "quantity": 1
@@ -82,6 +92,12 @@ export default function Page() {
     const result = await encryptApi(jsondata);
     await writeMintPrescription(addressPatient, result.encryptedData)
   }
+
+  useEffect(() => {
+    if(isConfirmedMint){
+      redirect("/")
+    }
+  },[isConfirmedMint])
 
   if (loadingRole) {
     return <p>Chargement...</p>
@@ -183,46 +199,33 @@ export default function Page() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Separator className="mb-4"/>
-                <div className="flex flex-col">
-                  <Label className="text-base font-semibold">
-                    DOLIPRANE 1000 mg, comprimé
-                  </Label>
-                  <Label className="text-sm">
-                    1 comprimé le matin pendant 1 semaine
-                  </Label>
-                </div>
-                <Separator className="my-4"/>
-                <div className="flex flex-col">
-                  <Label className="text-base font-semibold">
-                    DOLIPRANE 1000 mg, comprimé
-                  </Label>
-                  <Label className="text-sm">
-                    1 comprimé le matin pendant 1 semaine
-                  </Label>
-                </div>
-                <Separator className="my-4"/>
-                <div className="flex flex-col">
-                  <Label className="text-base font-semibold">
-                    DOLIPRANE 1000 mg, comprimé
-                  </Label>
-                  <Label className="text-sm">
-                    1 comprimé le matin pendant 1 semaine
-                  </Label>
-                </div>
+                <Separator className="mb-4" />
+
+                {medicaments.map((medic, index) => {
+                  return (
+                    <div key={index}>
+                      <div className="flex flex-col relative">
+                        <Label className="text-base font-semibold">
+                          {medic.name}
+                        </Label>
+                        <Label className="text-sm">
+                          {medic.posology}
+                        </Label>
+
+                        <Trash className="cursor-pointer absolute right-0 top-2" onClick={() => handleRemoveMedicament(index)} />
+                      </div>
+                      <Separator className="my-4" />
+                    </div>
+
+                  )
+                })}
+
               </CardContent>
               <CardFooter className="justify-center border-t p-4">
-                <Button size="sm" variant="ghost" className="gap-1">
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  Ajouter un médicament
-                </Button>
+                <BtnModalMedic onClose={handleAddMedicament} />
               </CardFooter>
             </Card>
           </div>
-
-
-
-
 
           <div>
             <Input id="address"

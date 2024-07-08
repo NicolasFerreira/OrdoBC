@@ -102,6 +102,7 @@ interface GetPrescription {
 
 export function useGetPrescription(prescriptionId: number) {
   const { address } = useAccount();
+  const [dataDecrypted, setDataDecrypted] = useState();
   const [dataPrescription, setDataPrescription] = useState<Prescription | null>(null);
 
   const { data: fetchedDataPrescription, error: errorPrescription, isLoading: isLoadingPrescription, refetch: refetchPrescription } = useReadContract({
@@ -118,19 +119,25 @@ export function useGetPrescription(prescriptionId: number) {
   useEffect(() => {
     console.log(fetchedDataPrescription)
     const temp: Prescription = fetchedDataPrescription as Prescription;
+    console.log("test :", temp)
     async function getdecryptedDetails() {
       console.log('les données encryptées : ',temp.encryptedDetails)
       const result = await decryptApi(temp.encryptedDetails)
       console.log(result);
       if (result !== undefined) {
         temp.encryptedDetails = result;
+        setDataPrescription(temp)
       }
-      return result
+
+      
     }
 
-    if (!isLoadingPrescription) {
+    if (temp !== undefined) {
+
+      console.log("fetchDecryptedDetails")
       getdecryptedDetails();
-      setDataPrescription(temp);
+
+      console.log("final datas : ", dataPrescription)
     }
 
   }, [isLoadingPrescription]);
@@ -166,6 +173,7 @@ export function useMintPrescription() {
   useEffect(() =>{
     if(isConfirmedMint){
       console.log('Prescription bien créée');
+      console.log(fetchedDataMint)
     }
     if(errorConfirmationMint){
       console.log('Une erreur est survenue lors de la création de la prescription');

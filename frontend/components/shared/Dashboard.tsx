@@ -17,9 +17,8 @@ const Dashboard: React.FC<DashboardProps> = ({ children, role}) => {
             <div className='grid grid-row-2 col-start-2 gap-4'>
                 <DashboardHeader />
                 <main className='grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8'>
-                    {role?.toString() ==="0" 
-                    ? <p>Votre addresse de wallet n'est pas enregistré dans le système </p>
-                    : children}
+                    {role?.toString() !=="0" ? children
+                    : <p>Votre addresse de wallet n'est pas enregistré dans le système </p>}
                 </main>
             </div>
             

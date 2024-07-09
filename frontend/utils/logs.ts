@@ -20,15 +20,21 @@ export async function getLogs(eventName: string) {
     default:
       throw new Error(`Event ${eventName} does not exist`);
   }
-  const blockStart = await publicClient.getBlockTransactionCount({
-    blockHash: hashContractDeploy
-  })
 
-  
+
+  var deploymentBlockNumber = BigInt(0);
+
+  if(process.env.NODE_ENV === "production"){
+    const receipt = await publicClient.getTransactionReceipt({hash: hashContractDeploy});
+
+    deploymentBlockNumber = receipt.blockNumber;
+  }
+
+  console.log(deploymentBlockNumber)
   const logs = await publicClient.getLogs({
     address: contractAddress,
     event: event,
-    fromBlock: process.env.NODE_ENV === "production" ? BigInt(blockStart) : BigInt(0), // Replace with the actual deployment block number if known
+    fromBlock:  deploymentBlockNumber, // Replace with the actual deployment block number if known
     toBlock: 'latest'
   });
 

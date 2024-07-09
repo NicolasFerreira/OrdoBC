@@ -7,10 +7,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { baseSepolia, hardhat } from "wagmi/chains";
 
+const chains = process.env.NODE_ENV === "production" ? [baseSepolia] : [hardhat, baseSepolia]
+
 const config = getDefaultConfig({
   appName: "OrdoBC",
   projectId: process.env.CLOUD_WALLET_KEY,
-  chains: [hardhat, baseSepolia],
+  chains: chains,
   ssr: true,
 });
 

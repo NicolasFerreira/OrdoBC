@@ -136,6 +136,7 @@ export function useGetPrescription(prescriptionId: number) {
 
       console.log("fetchDecryptedDetails")
       getdecryptedDetails();
+      
 
       console.log("final datas : ", dataPrescription)
     }

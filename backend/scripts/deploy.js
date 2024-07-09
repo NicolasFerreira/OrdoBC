@@ -80,6 +80,17 @@ async function main() {
 
     await Ordo.registerUser("0x63522F008590179d35E1F8aBE9A78b407e666667", 3, patientData);
     console.log("Patient registered:");
+
+    // so Wallets
+    await Ordo.registerUser("0x3D836C9149c26F3Cb2eCB084cc817fE0C877c191", 1, doctorData);
+    console.log("Doctor registered:");
+
+    await Ordo.registerUser("0xb79B525aC89965d8f164Ed0c670F7e38CBA37e65", 2, pharmacistData);
+    console.log("Pharmacist registered:");
+
+    await Ordo.registerUser("0xF4d15Ad565796d69FD3D4CB66F7A3508136ab63f", 3, patientData);
+    console.log("Patient registered:");
+
   }
 }
 

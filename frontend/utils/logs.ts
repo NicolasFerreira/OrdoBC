@@ -24,7 +24,7 @@ export async function getLogs(eventName: string) {
   const logs = await publicClient.getLogs({
     address: contractAddress,
     event: event,
-    fromBlock: BigInt(0), // Replace with the actual deployment block number if known
+    fromBlock: process.env.NODE_ENV === "production" ? BigInt(12384203) : BigInt(0), // Replace with the actual deployment block number if known
     toBlock: 'latest'
   });
 

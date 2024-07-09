@@ -113,8 +113,8 @@ export default function Home() {
    }
 
    useEffect(() => {
-    getLogs("PrescriptionMinted").then(async (data)=>{
-
+    getLogs("PrescriptionMinted").then(async (data:any)=>{
+      console.log(data)
       let arrayFiltered = data.filter((row:any) => row.doctor === address);
       let arr:any = []
       arrayFiltered.map(async (item:any)=>{
@@ -126,18 +126,13 @@ export default function Home() {
 
          // arr rempli 
          if(arr.length === arrayFiltered.length){
-          console.log(arr)
+          
+          console.log(arrayFiltered)
 
 
           setbodyTable(arrayFiltered);
          }
       })
-
-
-
-      
-      
-      
       console.log(bodyTable);
 
     });

@@ -2,6 +2,7 @@ import { publicClient } from "./client";
 import { contractAddress } from "@/constants";
 import { parseAbiItem, ParseAbiItem, Log } from "viem";
 
+const blockStart = 12341592;
 
 export async function getLogs(eventName: string) {
   let event: ParseAbiItem<string>;
@@ -24,7 +25,7 @@ export async function getLogs(eventName: string) {
   const logs = await publicClient.getLogs({
     address: contractAddress,
     event: event,
-    fromBlock: process.env.NODE_ENV === "production" ? BigInt(12384203) : BigInt(0), // Replace with the actual deployment block number if known
+    fromBlock: process.env.NODE_ENV === "production" ? BigInt(blockStart) : BigInt(0), // Replace with the actual deployment block number if known
     toBlock: 'latest'
   });
 

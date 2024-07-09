@@ -33,9 +33,7 @@ export async function getLogs(eventName: string) {
 
   const logs = await publicClient.getLogs({
     address: contractAddress,
-    event: event,
-    fromBlock:  'safe', // Replace with the actual deployment block number if known
-    toBlock: 'latest'
+    event: event
   });
 
   let newArray:any = [];

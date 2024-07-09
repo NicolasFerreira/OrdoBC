@@ -76,11 +76,16 @@ import { useRouter } from 'next/navigation'
 import { getLogs } from "@/utils/logs"
 import { useEffect,useState } from "react"
 import { decryptApi } from "@/hooks/useContract"
+import moment from 'moment';
+import { useAccount } from "wagmi";
+
 
 
 
 export default function Home() {
   const [bodyTable, setbodyTable ] = useState([])
+  const { address } = useAccount();
+
 
   const datas = {
     "headerTable":[
@@ -108,32 +113,32 @@ export default function Home() {
    }
 
    useEffect(() => {
-    getLogs("PrescriptionMinted").then((data)=>{
+    getLogs("PrescriptionMinted").then(async (data)=>{
 
-      // let arr:any = []
-      // data.map(async (item:any)=>{
-      //    let response = await decryptApi(item.encryptedDetails)
-      //    console.log(response)
-      //    arr.push(response);
+      let arrayFiltered = data.filter((row:any) => row.doctor === address);
+      let arr:any = []
+      arrayFiltered.map(async (item:any)=>{
+         let response = await decryptApi(item.encryptedDetails)
+         console.log(response)
+         arr.push(response);
 
-      //    // arr rempli 
-      //    if(arr.length === data.length){
-      //     console.log(arr)
+         item.encryptedDetails = response;
 
-      //    }
-      // })
+         // arr rempli 
+         if(arr.length === arrayFiltered.length){
+          console.log(arr)
+
+
+          setbodyTable(arrayFiltered);
+         }
+      })
+
+
 
       
       
-      // setbodyTable(data.map(async (prescri: { tokenId: number; patient: string; date_created: number, encryptedDetails: any }) => {
-      //   let p = await decryptApi(prescri.encryptedDetails)
-      //   return {
-      //     id:Number(p.prescriptionId),
-      //     patient:p.patientId,
-      //     date:Number(p.dateIssued)
-      //   };
-      // }));
-      // console.log(bodyTable);
+      
+      console.log(bodyTable);
 
     });
 
@@ -168,7 +173,7 @@ export default function Home() {
               <CardContent>
               <TablePrescriptions
                 headerTable={datas.headerTable}
-                bodyTable={datas.bodyTable}
+                bodyTable={bodyTable}
               />
               </CardContent>
               <CardFooter className="justify-center border-t p-4">
@@ -191,10 +196,9 @@ export default function Home() {
 
 
 export interface BodyTable {
-  id:      string;
-  patient: string;
-  date:    string;
-  status:  string;
+  tokenId:      string;
+  encryptedDetails:any;
+  date_created:    string;
 }
 
 export interface HeaderTable {
@@ -219,11 +223,10 @@ function TablePrescriptions({ headerTable, bodyTable }: TablePrescriptionsProps)
       </TableHeader>
       <TableBody>
         {bodyTable.map((row) =>{
-          return <TableRow key={crypto.randomUUID()}className="cursor-pointer" onClick={() => router.push('/prescription/' + row.id)}>
-            <TableCell>{row.id}</TableCell>
-            <TableCell>{row.patient}</TableCell>
-            <TableCell>{row.date}</TableCell>
-            <TableCell>{row.status}</TableCell>
+          return <TableRow key={crypto.randomUUID()}className="cursor-pointer" onClick={() => router.push('/prescription/' + row.tokenId)}>
+            <TableCell>{row.tokenId.toString()}</TableCell>
+            <TableCell>{row.encryptedDetails?.patient?.name}</TableCell>
+            <TableCell>{ moment.unix(Number(row.date_created)).format("MM/DD/YYYY")}</TableCell>
           </TableRow>
         })}
       </TableBody>

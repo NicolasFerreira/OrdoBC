@@ -75,7 +75,7 @@ export default function Page() {
   const handleMint = async () => {
     let jsondata = {
       "patient": {
-        name:"",
+        name:"Albin Michel",
         address: "",
         date_naissance:"01/10/1990"
       },

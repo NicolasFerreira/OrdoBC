@@ -263,6 +263,18 @@ export const contractAbi = [
 				"internalType": "address",
 				"name": "patient",
 				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "encryptedDetails",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "date_created",
+				"type": "uint256"
 			}
 		],
 		"name": "PrescriptionMinted",
@@ -320,6 +332,12 @@ export const contractAbi = [
 				"internalType": "enum Ordo.Roles",
 				"name": "role",
 				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "encryptedDatas",
+				"type": "string"
 			}
 		],
 		"name": "UserRegistered",
@@ -412,6 +430,11 @@ export const contractAbi = [
 						"internalType": "bool",
 						"name": "treated",
 						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "date_created",
+						"type": "uint256"
 					}
 				],
 				"internalType": "struct Ordo.Prescription",
@@ -752,4 +775,3 @@ export const contractAbi = [
 		"type": "function"
 	}
 ]
-

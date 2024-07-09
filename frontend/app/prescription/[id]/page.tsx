@@ -8,7 +8,7 @@ export default function Page({ params }: { params: { id: number } }) {
         <>
             <p>Prescription N°: {params.id}</p>
 
-            {dataPrescription && <pre className="text-wrap break-all">{JSON.stringify(dataPrescription)}</pre>}
+            {dataPrescription && <pre className="text-wrap break-all">{JSON.stringify(dataPrescription.encryptedDetails)}</pre>}
         </>
 
     )

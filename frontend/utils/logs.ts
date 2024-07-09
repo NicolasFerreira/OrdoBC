@@ -27,7 +27,7 @@ export async function getLogs(eventName: string) {
   if(process.env.NODE_ENV === "production"){
     const receipt = await publicClient.getTransactionReceipt({hash: hashContractDeploy});
 
-    deploymentBlockNumber = receipt.blockNumber;
+    deploymentBlockNumber = BigInt(receipt.blockNumber);
   }
 
   console.log(deploymentBlockNumber)

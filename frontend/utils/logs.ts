@@ -2,7 +2,7 @@ import { publicClient } from "./client";
 import { contractAddress } from "@/constants";
 import { parseAbiItem, ParseAbiItem, Log } from "viem";
 
-const blockStart = 12341592;
+const hashContractDeploy ="0x81c100f4b21097155b4fd21368f49f641f005208a5b490c1066ef266cb0dbb01" ;
 
 export async function getLogs(eventName: string) {
   let event: ParseAbiItem<string>;
@@ -20,6 +20,9 @@ export async function getLogs(eventName: string) {
     default:
       throw new Error(`Event ${eventName} does not exist`);
   }
+  const blockStart = await publicClient.getBlockTransactionCount({
+    blockHash: hashContractDeploy
+  })
 
   
   const logs = await publicClient.getLogs({

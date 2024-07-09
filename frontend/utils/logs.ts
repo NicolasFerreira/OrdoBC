@@ -25,15 +25,15 @@ export async function getLogs(eventName: string) {
   var deploymentBlockNumber = BigInt(0);
 
   if(process.env.NODE_ENV === "production"){
-    const actualBlock = await publicClient.getBlockNumber()
-
-    deploymentBlockNumber = BigInt(12382693);
+    deploymentBlockNumber = BigInt(12341592);
     console.log(deploymentBlockNumber)
   }
 
   const logs = await publicClient.getLogs({
     address: contractAddress,
-    event: event
+    event: event,
+    fromBlock:deploymentBlockNumber,
+    toBlock:"latest"
   });
 
   let newArray:any = [];

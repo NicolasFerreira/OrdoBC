@@ -92,48 +92,34 @@ export default function Home() {
     {"label":"N°", "className":""},
     {"label":"Nom Patient", "className":""},
     {"label":"Date de prescription", "className":""}
-  ],
-    "bodyTable":[{
-      "id":"1",
-      "patient":"John Doe",
-      "date":"2022-05-15",
-      "status":"En cours"
-    },{
-      "id":"2",
-      "patient":"Jane Doe",
-      "date":"2022-05-16",
-      "status":"Terminée"
-    },{
-      "id":"3",
-      "patient":"Mary Doe",
-      "date":"2022-05-17",
-      "status":"En attente"
-    }
-  ]
+    ]
    }
 
    useEffect(() => {
     getLogs("PrescriptionMinted").then(async (data:any)=>{
       console.log(data)
-      let arrayFiltered = data.filter((row:any) => row.doctor === address);
-      let arr:any = []
-      arrayFiltered.map(async (item:any)=>{
-         let response = await decryptApi(item.encryptedDetails)
-         console.log(response)
-         arr.push(response);
-
-         item.encryptedDetails = response;
-
-         // arr rempli 
-         if(arr.length === arrayFiltered.length){
-          
-          console.log(arrayFiltered)
-
-
-          setbodyTable(arrayFiltered);
-         }
-      })
-      console.log(bodyTable);
+      if(address){
+        let arrayFiltered = data.filter((row:any) => row.doctor === address);
+        let arr:any = []
+        arrayFiltered.map(async (item:any)=>{
+           let response = await decryptApi(item.encryptedDetails)
+           console.log(response)
+           arr.push(response);
+  
+           item.encryptedDetails = response;
+  
+           // arr rempli 
+           if(arr.length === arrayFiltered.length){
+            
+            console.log(arrayFiltered)
+  
+  
+            setbodyTable(arrayFiltered);
+           }
+        })
+        console.log(bodyTable);
+      }
+     
 
     });
 

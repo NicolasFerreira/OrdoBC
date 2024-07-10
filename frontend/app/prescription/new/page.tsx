@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext, use } from "react";
 import { redirect } from 'next/navigation';
 import Link from "next/link"
-import { useGetRole, useMintPrescription, encryptApi } from "@/hooks/useContract";
+import { useGetRole, useMintPrescription, encryptApi, decryptApi, useGetUserInfos } from "@/hooks/useContract";
 import { Prescription } from "@/types/ordoTypes";
 
 import { Input } from "@/components/ui/input"
@@ -44,6 +44,11 @@ import { Label } from "@/components/ui/label";
 import { BtnModalMedic } from "@/components/shared/BtnModalMedic";
 import { publicClient } from "@/utils/client";
 import { contractAddress } from "@/constants";
+import { Console } from "console";
+import moment from "moment";
+import { SearchInDatas } from "@/components/shared/SearhInDatas";
+import { Pencil2Icon } from '@radix-ui/react-icons'
+import { getLogs } from "@/utils/logs"
 
 interface Medicament {
   name: string;
@@ -53,9 +58,61 @@ interface Medicament {
 export default function Page() {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [addressPatient, setAddressPatient] = useState("0x90F79bf6EB2c4f870365E785982E1f101E93b906");
+  const [addressPatient, setAddressPatient] = useState("");
   const { loadingRole, isRegistered, isDoctor, isPatient, isPharmacist } = useGetRole();
   const { writeMintPrescription, isConfirmedMint } = useMintPrescription();
+  const { dataUser } = useGetUserInfos();
+  const [doctor, setDoctor] = useState({
+    lieu: "",
+    name: "",
+    num_rpps: "",
+    specialite: ""
+  })
+  const [patients, setPatients] = useState([
+    {
+      "sexe": "Homme",
+      "name": "Jean Dupont",
+      "dateNaissance": "1980-01-15",
+      "numSecu": "123456789012345",
+      "address":""
+    },
+    {
+      "sexe": "Femme",
+      "name": "Marie Curie",
+      "dateNaissance": "1975-04-20",
+      "numSecu": "234567890123456",
+      "address":""
+    },
+    {
+      "sexe": "Homme",
+      "name": "Pierre Martin",
+      "dateNaissance": "1990-09-10",
+      "numSecu": "345678901234567",
+      "address":""
+    },
+    {
+      "sexe": "Femme",
+      "name": "Sophie Dubois",
+      "dateNaissance": "1985-11-30",
+      "numSecu": "456789012345678",
+      "address":""
+    },
+    {
+      "sexe": "Homme",
+      "name": "Luc Leblanc",
+      "dateNaissance": "1995-07-25",
+      "numSecu": "567890123456789",
+      "address":""
+    }
+
+  ]
+  );
+  const [patient, setPatient] = useState({
+    sexe: "",
+    name: "",
+    dateNaissance: "",
+    numSecu: ""
+  })
 
   const [medicaments, setMedicaments] = useState<Medicament[]>([])
 
@@ -68,36 +125,78 @@ export default function Page() {
     setMedicaments(medicaments.filter((_, i) => i !== index));
   }
 
-  const getDoctorInfos = () => {
+  const getDoctorInfos = async () => {
+    if (dataUser) {
+      const res = await decryptApi(dataUser[1])
+      setDoctor(res)
+    }
+  }
 
+  const handleSelectPatient = (value:any) => {
+    console.log('Selected:', value);
+    setPatient(value)
+    // ici ajouter code pour recup addressPatient avec un filter sur data log 
+    setAddressPatient("0x90F79bf6EB2c4f870365E785982E1f101E93b906")
   }
 
   const handleMint = async () => {
-    let jsondata = {
-      "patient": {
-        name:"Albin Michel",
-        address: "",
-        date_naissance:"01/10/1990"
-      },
-      "doctor": {
-      },
-      "medications": medicaments,
-      "notes": "",
-      "refill": {
-        "allowed": true,
-        "quantity": 1
+    if(patient.name !== ""){
+      let jsondata = {
+        "patient": patient,
+        "doctor": doctor,
+        "medicaments": medicaments,
+        "notes": ""
       }
+  
+      
+
+      const result = await encryptApi(jsondata);
+      await writeMintPrescription(addressPatient, result.encryptedData)
+    } else {
+      console.error("Aucun patient n'a été selectionné")
     }
-    console.log('data to encrypt', jsondata)
-    const result = await encryptApi(jsondata);
-    await writeMintPrescription(addressPatient, result.encryptedData)
+    
+  }
+
+  const getLogsPatients = async () => {
+    // getLogs("UserRegistered").then(async (data:any)=>{
+    //   console.log(data)
+    //   // let arrayFiltered = data.filter((row:any) => row.doctor === address);
+    //   // let arr:any = []
+    //   // arrayFiltered.map(async (item:any)=>{
+    //   //    let response = await decryptApi(item.encryptedDetails)
+    //   //    console.log(response)
+    //   //    arr.push(response);
+
+    //   //    item.encryptedDetails = response;
+
+    //   //    // arr rempli 
+    //   //    if(arr.length === arrayFiltered.length){
+          
+    //   //     console.log(arrayFiltered)
+
+
+    //   //     setbodyTable(arrayFiltered);
+    //   //    }
+    //   // })
+    //   // console.log(bodyTable);
+
+    // });
   }
 
   useEffect(() => {
-    if(isConfirmedMint){
+    if (isConfirmedMint) {
       redirect("/")
     }
-  },[isConfirmedMint])
+  }, [isConfirmedMint])
+
+  useEffect(() => {
+    if (dataUser) {
+      getDoctorInfos()
+      getLogsPatients()
+    }
+
+  }, [dataUser])
 
   if (loadingRole) {
     return <p>Chargement...</p>
@@ -122,15 +221,15 @@ export default function Page() {
             <Card >
               <CardContent>
                 <div className="grid gap-3 py-4">
-                  <div className="font-semibold">Docteur John Doe</div>
+                  <div className="font-semibold">{doctor.name}</div>
                   <dl className="grid gap-3">
                     <div className="flex items-center justify-between">
                       <dt className="text-muted-foreground">Spécialité</dt>
-                      <dd>Médecine générale</dd>
+                      <dd>{doctor.specialite}</dd>
                     </div>
                     <div className="flex items-center justify-between">
                       <dt className="text-muted-foreground">N° RPPS</dt>
-                      <dd>123456780</dd>
+                      <dd>{doctor.name}</dd>
                     </div>
 
                   </dl>
@@ -140,9 +239,8 @@ export default function Page() {
                   <div className="grid gap-3">
                     <div className="font-semibold">Addresse</div>
                     <address className="grid gap-0.5 not-italic text-muted-foreground">
-                      <span>Liam Johnson</span>
-                      <span>1234 Main St.</span>
-                      <span>Anytown, CA 12345</span>
+                      <span>{doctor.lieu}</span>
+
                     </address>
                   </div>
 
@@ -155,30 +253,53 @@ export default function Page() {
 
             <Card >
               <CardContent>
-                <div className="grid gap-3 py-4">
+                <div className="grid gap-3 py-4 relative">
                   <div className="font-semibold">Patient</div>
-                  <dl className="grid gap-3">
-                    <div className="flex items-center justify-between">
-                      <dt className="text-muted-foreground">Nom</dt>
-                      <dd>Jean Moulin</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <dt className="text-muted-foreground">Date de naissance</dt>
-                      <dd>28/12/1989</dd>
-                    </div>
-                  </dl>
+
+                  {patient.name !== "" ?
+                    <dl className="grid gap-3">
+                      <Pencil2Icon 
+                        className="w-[40px] h-[40px] cursor-pointer absolute top-4 right-0 p-2"
+                        onClick={() => setPatient({
+                          sexe: "",
+                          name: "",
+                          dateNaissance: "",
+                          numSecu: ""
+                        })}
+                      />
+                      <div className="flex items-center justify-between">
+                        <dt className="text-muted-foreground">Nom</dt>
+                        <dd>{patient.name}</dd>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <dt className="text-muted-foreground">Date de naissance</dt>
+                        <dd>{moment(patient.dateNaissance).format('DD/MM/YYYY')}</dd>
+                      </div>
+                    </dl>
+                    :
+                    <dl className="grid gap-3">
+                      
+                        <SearchInDatas
+                          data={patients}
+                          valueKey="name"
+                          textKey="name"
+                          mode="patient"
+                          onSelect={handleSelectPatient}
+                        />
+                      
+                    </dl>
+                  }
+
+
+
                 </div>
                 <Separator className="my-4" />
                 <div className="grid gap-3 ">
                   <div className="font-semibold">Informations ordonnances</div>
                   <dl className="grid gap-3">
                     <div className="flex items-center justify-between">
-                      <dt className="text-muted-foreground">Fait à </dt>
-                      <dd>Cahors</dd>
-                    </div>
-                    <div className="flex items-center justify-between">
                       <dt className="text-muted-foreground">Le </dt>
-                      <dd>04/07/2024</dd>
+                      <dd>{moment().format('DD/MM/YYYY')}</dd>
                     </div>
                   </dl>
                 </div>
@@ -227,13 +348,8 @@ export default function Page() {
             </Card>
           </div>
 
-          <div>
-            <Input id="address"
-              type="search"
-              value={addressPatient}
-              onChange={(e) => setAddressPatient(e.target.value)}
-              placeholder="x0..." />
-            <Button onClick={handleMint}>Nouvelle Ordonnance</Button>
+          <div className="flex justify-end">
+            <Button onClick={handleMint} disabled={patient.name === ""}>Générer l'ordonnance</Button>
           </div>
         </div>
 

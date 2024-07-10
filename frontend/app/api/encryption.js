@@ -4,9 +4,6 @@
 import AES from 'crypto-js/aes';
 import CryptoJS from 'crypto-js';
 
-// Exemple de données à encrypter et de clé privée
-const dataToEncrypt = { field1: "value1", field2: 12345 };
-
 const privateKey = process.env.ENCRYPTION_KEY; 
 
 export const encrypt = (dataToEncrypt) => {

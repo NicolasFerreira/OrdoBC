@@ -25,8 +25,7 @@ export async function getLogs(eventName: string) {
   var deploymentBlockNumber = BigInt(0);
 
   if(process.env.NODE_ENV === "production"){
-    deploymentBlockNumber = BigInt(12341592);
-    console.log(deploymentBlockNumber)
+    deploymentBlockNumber = BigInt(12432333);
   }
 
   const logs = await publicClient.getLogs({

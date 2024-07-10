@@ -12,7 +12,7 @@ export async function encryptApi(dataToEncrypt: any) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ data: dataToEncrypt, action: 'encrypt' }),
-      cache: 'no-store' 
+      cache: 'no-store'
     });
     const result = await response.json();
     console.log('Encrypted data:', result.encryptedData);
@@ -121,24 +121,31 @@ export function useGetPrescription(prescriptionId: number) {
     const temp: Prescription = fetchedDataPrescription as Prescription;
     console.log("test :", temp)
     async function getdecryptedDetails() {
-      console.log('les données encryptées : ',temp.encryptedDetails)
-      const result = await decryptApi(temp.encryptedDetails)
-      console.log(result);
-      if (result !== undefined) {
-        temp.encryptedDetails = result;
+      console.log('les données encryptées : ', temp.encryptedDetails)
+      if (typeof temp.encryptedDetails === "string") {
+        const result = await decryptApi(temp.encryptedDetails)
+        console.log(result);
+        if (result !== undefined) {
+          temp.encryptedDetails = result;
+          setDataPrescription(temp)
+
+          console.log("final datas : ", dataPrescription)
+        }
+
+
+      } else {
+        console.log('else : ',temp)
         setDataPrescription(temp)
       }
 
-      
     }
 
     if (temp !== undefined) {
 
       console.log("fetchDecryptedDetails")
       getdecryptedDetails();
-      
 
-      console.log("final datas : ", dataPrescription)
+
     }
 
   }, [isLoadingPrescription]);
@@ -148,10 +155,10 @@ export function useGetPrescription(prescriptionId: number) {
 }
 
 export function useMintPrescription() {
-  const { data: fetchedDataMint, error: errorMint, isPending: isPendingMint, writeContract: writeMint} = useWriteContract({});
+  const { data: fetchedDataMint, error: errorMint, isPending: isPendingMint, writeContract: writeMint } = useWriteContract({});
 
-  async function writeMintPrescription(addressPatient: string, dataPrescription: string){
-    console.log('write contract : ',{
+  async function writeMintPrescription(addressPatient: string, dataPrescription: string) {
+    console.log('write contract : ', {
       address: contractAddress,
       abi: contractAbi,
       functionName: "mintPrescription",
@@ -164,26 +171,50 @@ export function useMintPrescription() {
       args: [addressPatient, dataPrescription]
     });
   }
-  
+
   const {
     isLoading: isConfirmingMint,
     isSuccess: isConfirmedMint,
     error: errorConfirmationMint,
   } = useWaitForTransactionReceipt({ hash: fetchedDataMint });
 
-  useEffect(() =>{
-    if(isConfirmedMint){
+  useEffect(() => {
+    if (isConfirmedMint) {
       console.log('Prescription bien créée');
       console.log(fetchedDataMint)
     }
-    if(errorConfirmationMint){
+    if (errorConfirmationMint) {
       console.log('Une erreur est survenue lors de la création de la prescription');
     }
-    if(errorMint) {
+    if (errorMint) {
       console.log(errorMint.message);
     }
-  },[isConfirmedMint,errorConfirmationMint, errorMint])
+  }, [isConfirmedMint, errorConfirmationMint, errorMint])
 
 
   return { fetchedDataMint, errorMint, isPendingMint, isConfirmedMint, isConfirmingMint, errorConfirmationMint, writeMintPrescription };
+}
+
+
+
+export function useGetUserInfos() {
+  const { address } = useAccount();
+  const [dataUser, setDataUser] = useState();
+
+  const { data: fetchedDataUser, error: errorUser, isLoading: isLoadingUser, refetch: refetchUser } = useReadContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "users",
+    account: address,
+    query: {
+      refetchOnWindowFocus: false,
+    },
+    args: [address]
+  });
+
+  useEffect(() => {
+    setDataUser(fetchedDataUser as any);
+  }, [fetchedDataUser]);
+
+  return { dataUser, errorUser, isLoadingUser, refetchUser };
 }

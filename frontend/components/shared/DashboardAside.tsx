@@ -17,7 +17,6 @@ const DashboardAside:React.FC<DashboardAsideProps> = ({role})=> {
         {link: "/", icons: "ScrollText", textTooltip:"Ordonnances"},
         {link: "/patients", icons: "ContactRound", textTooltip:"Patients"},
         {link: "/profile", icons: "UserRound", textTooltip:"Mon Profil"},
-        {link: "/dashboard", icons: "Settings", textTooltip:"Dashboard"},
     ])
   
     useEffect(()=>{

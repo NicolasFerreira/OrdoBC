@@ -74,28 +74,28 @@ export default function Page() {
       "name": "Jean Dupont",
       "dateNaissance": "1980-01-15",
       "numSecu": "123456789012345",
-      "address":""
+      "address":"0xf7ccd5DaB1059204304146AF1f7DDC87B93545Ba"
     },
     {
       "sexe": "Femme",
       "name": "Marie Curie",
       "dateNaissance": "1975-04-20",
       "numSecu": "234567890123456",
-      "address":""
+      "address":"0x63522F008590179d35E1F8aBE9A78b407e666667"
     },
     {
       "sexe": "Homme",
       "name": "Pierre Martin",
       "dateNaissance": "1990-09-10",
       "numSecu": "345678901234567",
-      "address":""
+      "address":"0xF4d15Ad565796d69FD3D4CB66F7A3508136ab63f"
     },
     {
       "sexe": "Femme",
       "name": "Sophie Dubois",
       "dateNaissance": "1985-11-30",
       "numSecu": "456789012345678",
-      "address":""
+      "address":"0x6CD9DF341B8Ca50e40605948Dd6aC8c880642670"
     },
     {
       "sexe": "Homme",
@@ -111,7 +111,8 @@ export default function Page() {
     sexe: "",
     name: "",
     dateNaissance: "",
-    numSecu: ""
+    numSecu: "",
+    address:""
   })
 
   const [medicaments, setMedicaments] = useState<Medicament[]>([])
@@ -136,7 +137,7 @@ export default function Page() {
     console.log('Selected:', value);
     setPatient(value)
     // ici ajouter code pour recup addressPatient avec un filter sur data log 
-    setAddressPatient("0x90F79bf6EB2c4f870365E785982E1f101E93b906")
+    setAddressPatient(value.address)
   }
 
   const handleMint = async () => {
@@ -264,7 +265,8 @@ export default function Page() {
                           sexe: "",
                           name: "",
                           dateNaissance: "",
-                          numSecu: ""
+                          numSecu: "",
+                          address: ""
                         })}
                       />
                       <div className="flex items-center justify-between">

@@ -164,7 +164,7 @@ contract Ordo is ERC721, Ownable {
      */
     function markAsTreated(uint256 _tokenId) external onlyPharmacist checkTokenExists(_tokenId) {
         Prescription storage prescription = _prescriptions[_tokenId];
-        if(!prescription.treated){
+        if(prescription.treated){
             revert PrescriptionAlreadyTreated();
         }
         prescription.treated = true;

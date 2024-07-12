@@ -1,4 +1,4 @@
-const addressProd = process.env.CONTRACT_ADDRESS_PROD;
+const addressProd = "0x98719B185925aea4B5ab3e24d2098452C3A1A1dc";
 const addressHardhat = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
 export const contractAddress = process.env.NODE_ENV === "production" ? addressProd : addressHardhat;
 

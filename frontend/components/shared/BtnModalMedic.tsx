@@ -29,11 +29,11 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface SBtnModalMedicProps {
+interface BtnModalMedicProps {
     onClose: (name:string,posology:string) => void;
   }
 
-export function BtnModalMedic({ onClose }: SBtnModalMedicProps) {
+export function BtnModalMedic({ onClose }: BtnModalMedicProps) {
 
     const [datas, setDatas] = useState([]);
     const [medic, setMedic] = useState("");

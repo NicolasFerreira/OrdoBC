@@ -12,6 +12,7 @@ error NotRegistred();
 error GetPrescriptionUnauthorized();
 error NotPharmacist();
 error AddressToMintIsNotPatient(address);
+error PrescriptionAlreadyTreated();
 error SoulboundTransferFailed();
 
 contract Ordo is ERC721, Ownable {
@@ -41,15 +42,17 @@ contract Ordo is ERC721, Ownable {
         string encryptedDetails;
         bool treated;
         uint256 date_created;
+        uint256 date_treated;
+        address pharmacist;
     }
 
     // Mapping to store prescriptions
     mapping(uint256 => Prescription) private _prescriptions;
 
     // Events
-    event UserRegistered(address indexed user, Roles role, string encryptedDatas);
+    event UserRegistered(address indexed user, uint8 indexed role, string encryptedDatas);
     event PrescriptionMinted(uint256 indexed tokenId, address indexed doctor, address indexed patient, string encryptedDetails, uint256 date_created);
-    event PrescriptionTreated(uint256 indexed tokenId);
+    event PrescriptionTreated(uint256 indexed tokenId, address indexed pharmacist ,uint256 date_treated );
 
     /**
      * @dev Constructor to initialize the contract with a name and symbol for the NFT.
@@ -110,7 +113,7 @@ contract Ordo is ERC721, Ownable {
             role: _role,
             encryptedDatas: _encryptedDatas
         });
-        emit UserRegistered(_userAddress, _role, _encryptedDatas);
+        emit UserRegistered(_userAddress, uint8(_role), _encryptedDatas);
     }
 
     /**
@@ -131,7 +134,9 @@ contract Ordo is ERC721, Ownable {
             patient: _to,
             encryptedDetails: _encryptedDetails,
             treated: false,
-            date_created: block.timestamp
+            date_created: block.timestamp,
+            date_treated: 0,
+            pharmacist: address(0)
         });
 
         _safeMint(_to, tokenId);
@@ -159,8 +164,12 @@ contract Ordo is ERC721, Ownable {
      */
     function markAsTreated(uint256 _tokenId) external onlyPharmacist checkTokenExists(_tokenId) {
         Prescription storage prescription = _prescriptions[_tokenId];
+        if(!prescription.treated){
+            revert PrescriptionAlreadyTreated();
+        }
         prescription.treated = true;
-        emit PrescriptionTreated(_tokenId);
+        prescription.date_treated = block.timestamp;
+        emit PrescriptionTreated(_tokenId, msg.sender, block.timestamp);
     }
 
     /**
@@ -168,7 +177,7 @@ contract Ordo is ERC721, Ownable {
      * @return The base URI as a string.
      */
     function _baseURI() internal pure override returns (string memory) {
-        return "https://api.example.com/metadata/";
+        return "https://ipfs.io/ipfs/QmWpKMVKmH2Que7bNu7bbhzqXF5DpzUzz1KR12vwVhLk56/";
     }
 
     /**

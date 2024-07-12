@@ -8,3 +8,4 @@ export const config = createConfig({
     [baseSepolia.id]: http(),
   },
 })
+

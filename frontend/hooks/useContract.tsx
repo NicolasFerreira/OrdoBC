@@ -81,6 +81,7 @@ export function useGetRole(): GetRole {
 
   useEffect(() => {
     setRole(dataRole as Role);
+    console.log("attribution du role : " + dataRole)
     // check is role
     dataRole === 1 ? setIsDoctor(true) : setIsDoctor(false)
     dataRole === 2 ? setIsPharmacist(true) : setIsPharmacist(false)
@@ -100,12 +101,12 @@ interface GetPrescription {
   refetchPrescription: ReturnType<typeof useReadContract>["refetch"];
 }
 
-export function useGetPrescription(prescriptionId: number) {
+export function useGetPrescription(prescriptionId: number):GetPrescription {
   const { address } = useAccount();
   const [dataDecrypted, setDataDecrypted] = useState();
   const [dataPrescription, setDataPrescription] = useState<Prescription | null>(null);
 
-  const { data: fetchedDataPrescription, error: errorPrescription, isLoading: isLoadingPrescription, refetch: refetchPrescription } = useReadContract({
+  const { data: fetchedDataPrescription, error: errorPrescription, isLoading: isLoadingPrescription, refetch: refetchPrescription , isRefetchError} = useReadContract({
     address: contractAddress,
     abi: contractAbi,
     functionName: "getPrescription",
@@ -146,6 +147,11 @@ export function useGetPrescription(prescriptionId: number) {
       getdecryptedDetails();
 
 
+    }
+
+    if(isRefetchError){
+      console.log('isRefetchError : ', isRefetchError)
+      
     }
 
   }, [isLoadingPrescription]);
@@ -195,6 +201,47 @@ export function useMintPrescription() {
   return { fetchedDataMint, errorMint, isPendingMint, isConfirmedMint, isConfirmingMint, errorConfirmationMint, writeMintPrescription };
 }
 
+export function useMarkAsTreated() {
+  const { data: fetchedDataMark, error: errorMark, isPending: isPendingMark, writeContract: writeMark } = useWriteContract({});
+
+  async function writeMarkAsTreated(idPrescription: number) {
+    console.log(typeof Number(idPrescription))
+    console.log('write contract : ', {
+      address: contractAddress,
+      abi: contractAbi,
+      functionName: "markAsTreated",
+      args: [Number(idPrescription)]
+    })
+    await writeMark({
+      address: contractAddress,
+      abi: contractAbi,
+      functionName: "markAsTreated",
+      args: [Number(idPrescription)]
+    });
+  }
+
+  const {
+    isLoading: isConfirmingMark,
+    isSuccess: isConfirmedMark,
+    error: errorConfirmationMark,
+  } = useWaitForTransactionReceipt({ hash: fetchedDataMark });
+
+  useEffect(() => {
+    if (isConfirmedMark) {
+      console.log('Prescription bien créée');
+      console.log(fetchedDataMark)
+    }
+    if (errorConfirmationMark) {
+      console.log('Une erreur est survenue lors de la création de la prescription');
+    }
+    if (errorMark) {
+      console.log(errorMark.message);
+    }
+  }, [isConfirmedMark, errorConfirmationMark, errorMark])
+
+
+  return { fetchedDataMark, errorMark, isPendingMark, isConfirmedMark, isConfirmingMark, errorConfirmationMark, writeMarkAsTreated };
+}
 
 
 export function useGetUserInfos() {

@@ -3,6 +3,7 @@ export interface Prescription {
     patientId:      string;
     doctorId:       string;
     pharmacistId:   string;
+    treated:        boolean;
     dateIssued:     Date;
     medications:    Medication[];
     notes:          string;

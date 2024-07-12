@@ -13,15 +13,46 @@ interface DashboardAsideProps {
 }
 
 const DashboardAside:React.FC<DashboardAsideProps> = ({role})=> {
+    
     const [nav, setNav] = useState([
         {link: "/", icons: "ScrollText", textTooltip:"Ordonnances"},
-        {link: "/patients", icons: "ContactRound", textTooltip:"Patients"},
-        {link: "/profile", icons: "UserRound", textTooltip:"Mon Profil"},
+        {link: "/profile", icons: "UserRound", textTooltip:"Profil"},
     ])
+
+    
   
     useEffect(()=>{
        if (role?.toString() ==="0"){
         setNav([])
+       }
+
+       
+       switch (role?.toString()) {
+         case "0":
+           setNav([])
+           break;
+         case "1":
+           setNav([
+            {link: "/", icons: "ScrollText", textTooltip:"Ordonnances"},
+            {link: "/patients", icons: "UsersRound", textTooltip:"Patients"},
+            {link: "/profile", icons: "UserRound", textTooltip:"Profil Docteur"},
+           ])
+           break;
+         case "2":
+           setNav([
+            {link: "/", icons: "ScrollText", textTooltip:"Ordonnances"},
+            {link: "/profile", icons: "UserRound", textTooltip:"Profil Pharma"},
+           ])
+           break;
+         case "3":
+           setNav([
+            {link: "/", icons: "ScrollText", textTooltip:"Mes ordonnances"},
+            {link: "/profile", icons: "UserRound", textTooltip:"Profil Patient"},
+           ])
+           break;
+         default:
+           console.log(`Role "${role}" not recognized.`)
+           break;
        }
     }, [role])
 

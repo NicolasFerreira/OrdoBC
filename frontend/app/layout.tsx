@@ -7,7 +7,7 @@ import RainbowKitAndWagmiProvider from "./RainbowKitAndWagmiProvider";
 
 export const metadata: Metadata = {
   title: "OrdoBc",
-  description: "Dapp d'odonnance numérique sur la blockchain Base",
+  description: "Dapp d'odonnance numérique sur la blockchain Base"
 };
 
 export default function RootLayout({

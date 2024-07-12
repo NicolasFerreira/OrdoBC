@@ -1,49 +1,70 @@
 import { publicClient } from "./client";
-import { contractAddress } from "@/constants";
-import { parseAbiItem, ParseAbiItem, Log } from "viem";
 
-const hashContractDeploy ="0x81c100f4b21097155b4fd21368f49f641f005208a5b490c1066ef266cb0dbb01" ;
+import { parseAbiItem, ParseAbiItem, Log , getContract} from "viem";
+import { useWatchContractEvent } from 'wagmi'
+import { config } from '@/utils/config';
+import { contractAbi, contractAddress } from "@/constants"
 
-export async function getLogs(eventName: string) {
+
+
+export async function getLogs(eventName: string, filter?: string) {
   let event: ParseAbiItem<string>;
 
   switch (eventName) {
     case "UserRegistered":
-      event = parseAbiItem("event UserRegistered(address indexed user, Roles role, string encryptedDatas)");
+      event = parseAbiItem("event UserRegistered(address indexed user, uint8 indexed role, string encryptedDatas)");
       break;
     case "PrescriptionMinted":
       event = parseAbiItem("event PrescriptionMinted(uint256 indexed tokenId, address indexed doctor, address indexed patient, string encryptedDetails, uint256 date_created)");
       break;
     case "PrescriptionTreated":
-      event = parseAbiItem("event PrescriptionTreated(uint256 indexed tokenId)");
+      event = parseAbiItem("event PrescriptionTreated(uint256 indexed tokenId, address indexed pharmacist ,uint256 date_treated)");
       break;
     default:
       throw new Error(`Event ${eventName} does not exist`);
   }
 
 
-  var deploymentBlockNumber = BigInt(0);
+  var args: any = {}
 
-  if(process.env.NODE_ENV === "production"){
+  var deploymentBlockNumber = BigInt(0);
+  if (process.env.NODE_ENV === "production") {
     deploymentBlockNumber = BigInt(12432333);
   }
 
-  const logs = await publicClient.getLogs({
-    address: contractAddress,
-    event: event,
-    fromBlock:deploymentBlockNumber,
-    toBlock:"latest"
-  });
+  var logs: any[] = []
 
-  let newArray:any = [];
-    // Et on met ces events dans le state "events" en formant un objet cohérent pour chaque event
-    logs.forEach(ev => {
-      if (ev.args) {
-        newArray.push(ev.args)
-      }
+  if (filter) {
+
+    const filter = await publicClient.createEventFilter({
+      address: contractAddress,
+      event: event,
+      fromBlock: deploymentBlockNumber,
+      toBlock: "latest",
+      args: { role:3 }
     })
 
-    
+    logs = await publicClient.getFilterLogs({ filter })
 
+
+
+  } else {
+    logs = await publicClient.getLogs({
+      address: contractAddress,
+      event: event,
+      fromBlock: deploymentBlockNumber,
+      toBlock: "latest"
+    });
+  }
+  let newArray: any = [];
+  // Et on met ces events dans le state "events" en formant un objet cohérent pour chaque event
+  logs.forEach(ev => {
+    if (ev.args) {
+      console.log(typeof ev.args.role)
+      newArray.push(ev.args)
+    }
+  })
   return newArray;
 }
+
+

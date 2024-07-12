@@ -96,13 +96,21 @@ describe("Ordo", function () {
             });
 
             it("should mint a prescription", async function () {
-                await this.ordo.connect(this.addr1).mintPrescription(this.addr3.address, encryptedDetails);
+                const tx = await this.ordo.connect(this.addr1).mintPrescription(this.addr3.address, encryptedDetails);
+                const receipt = await tx.wait();
+                const block = await ethers.provider.getBlock(receipt.blockNumber);
+                const timestamp = block.timestamp;
+
+                
                 // check datas prescription is correct
                 const prescription = await this.ordo.connect(this.addr3).getPrescription(1);
                 expect(prescription[0]).to.equal(this.addr1.address);
                 expect(prescription[1]).to.equal(this.addr3.address);
                 expect(prescription[2]).to.equal(encryptedDetails);
                 expect(prescription[3]).to.be.false;
+                expect(prescription[4]).to.equal(timestamp);
+                expect(prescription[5]).to.equal(0);
+                expect(prescription[6]).to.equal("0x0000000000000000000000000000000000000000"); 
                 //check ownerOf NFT is the address of patient
                 const ownerOrdo = await this.ordo.ownerOf(1);
                 expect(ownerOrdo).to.equal(this.addr3.address);
@@ -171,9 +179,14 @@ describe("Ordo", function () {
             })
 
             it("should emit an event when an prescription is treated", async function () {
-                await expect(this.ordo.connect(this.addr2).markAsTreated(1))
+                const tx = await this.ordo.connect(this.addr2).markAsTreated(1);
+                const receipt = await tx.wait();
+                const block = await ethers.provider.getBlock(receipt.blockNumber);
+                const timestamp = block.timestamp;
+
+                await expect(tx)
                     .to.emit(this.ordo, "PrescriptionTreated")
-                    .withArgs(1);
+                    .withArgs(1, this.addr2.address ,timestamp);
             });
 
         });

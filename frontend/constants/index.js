@@ -288,6 +288,18 @@ export const contractAbi = [
 				"internalType": "uint256",
 				"name": "tokenId",
 				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "pharmacist",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "date_treated",
+				"type": "uint256"
 			}
 		],
 		"name": "PrescriptionTreated",
@@ -328,8 +340,8 @@ export const contractAbi = [
 				"type": "address"
 			},
 			{
-				"indexed": false,
-				"internalType": "enum Ordo.Roles",
+				"indexed": true,
+				"internalType": "uint8",
 				"name": "role",
 				"type": "uint8"
 			},
@@ -435,6 +447,16 @@ export const contractAbi = [
 						"internalType": "uint256",
 						"name": "date_created",
 						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "date_treated",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "pharmacist",
+						"type": "address"
 					}
 				],
 				"internalType": "struct Ordo.Prescription",

@@ -1,5 +1,5 @@
 "use client"
-import { useGetPrescription } from "@/hooks/useContract";
+import { useGetPrescription, useMarkAsTreated } from "@/hooks/useContract";
 import moment from "moment";
 import { useState, useEffect } from "react";
 import {
@@ -12,40 +12,84 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { useAccount } from "wagmi";
+import { useGetRole } from "@/hooks/useContract";
+import {BtnShowQRcode} from "@/components/shared/BtnShowQRcode";
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button";
+import{ Prescription } from "@/types/ordoTypes"
+
 
 export default function Page({ params }: { params: { id: number } }) {
-    const { dataPrescription } = useGetPrescription(params.id);
-
+    const { dataPrescription, refetchPrescription } = useGetPrescription(params.id);
+    const { writeMarkAsTreated, isConfirmedMark, errorConfirmationMark, errorMark , fetchedDataMark} = useMarkAsTreated();
     const [ordo, setOrdo] = useState<any>()
+    const { address } = useAccount();
+    const {  isPatient , isPharmacist} = useGetRole();
+    const [isTreated, setIsTreated] = useState(false)
 
     useEffect(() => {
         if(dataPrescription !== null){
             let res:any = dataPrescription.encryptedDetails;
-            setOrdo(res)
-        }
             
-        
+            setOrdo(res)
+            setIsTreated(dataPrescription.treated)
+            console.log(ordo)
+        }
     },[dataPrescription]);
 
-    // return (
-    //     <>
+    const handleMarkAsTreated = async () => {
+      await writeMarkAsTreated(params.id)
+    }
 
-    //         {dataPrescription && <pre className="text-wrap break-all">{JSON.stringify(dataPrescription.encryptedDetails)}</pre>}
-    //     </>
+    const refetchPage = async () => {
+      const res = await refetchPrescription()
+      console.log("refetchPage - res - ", res)
+      if(res.status === "success" && res.data){
+        const prescriptionData = res.data as Prescription; 
+        setIsTreated(prescriptionData.treated)
+        console.log("avant",prescriptionData.treated)
+        console.log("isTreated - ", isTreated)
+      }
+    }
+  
+    useEffect(() => {
+      if(isConfirmedMark){
 
+        refetchPage()
+      }
+      if(errorConfirmationMark){
+        console.error("Une erreur est survenue lors de la mise à jour de la prescription - errorConfirmationMark - ", errorConfirmationMark)
+      }
+      if(errorMark){
+        console.error("Une erreur est survenue lors de la récupération de la prescription - errorMark - ", errorMark)
+      }
+    },[isConfirmedMark,errorConfirmationMark,errorMark, fetchedDataMark])
 
-
-    // )
+    if(isPatient && address !== ordo?.patient.address){
+      return (
+        <div>Cette prescription ne vous appartient pas.</div>
+      )
+    }
 
     if(dataPrescription && ordo) {
         return (
             <>
               <div className="mx-auto grid w-full max-w-[59rem] flex-1 auto-rows-max gap-4">
       
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 relative">
                   <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                    Prescription N°: {params.id}
+                    Ordonnance N°: {params.id} {isTreated && <Badge className="ml-4">Traitée</Badge>}
                   </h1>
+
+                  {isPatient &&
+                  <div className="absolute right-0">
+                    <BtnShowQRcode id={params.id}/>
+                  </div>
+                   
+                  }
+
+                 
       
                 </div>
                
@@ -153,6 +197,13 @@ export default function Page({ params }: { params: { id: number } }) {
                 
                   </Card>
                 </div>
+
+                {isPharmacist && 
+                  <div className="flex justify-end mb-8">
+                    <Button onClick={handleMarkAsTreated} disabled={isTreated}>Marquer l'ordonnance "traitée"</Button>
+                  </div>
+                }
+                
       
                 
               </div>
@@ -162,7 +213,5 @@ export default function Page({ params }: { params: { id: number } }) {
             </>
           )
     }
-
-   
 }
 

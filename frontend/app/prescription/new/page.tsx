@@ -68,51 +68,15 @@ export default function Page() {
     num_rpps: "",
     specialite: ""
   })
-  const [patients, setPatients] = useState([
-    {
-      "sexe": "Homme",
-      "name": "Jean Dupont",
-      "dateNaissance": "1980-01-15",
-      "numSecu": "123456789012345",
-      "address":"0xf7ccd5DaB1059204304146AF1f7DDC87B93545Ba"
-    },
-    {
-      "sexe": "Femme",
-      "name": "Marie Curie",
-      "dateNaissance": "1975-04-20",
-      "numSecu": "234567890123456",
-      "address":"0x63522F008590179d35E1F8aBE9A78b407e666667"
-    },
-    {
-      "sexe": "Homme",
-      "name": "Pierre Martin",
-      "dateNaissance": "1990-09-10",
-      "numSecu": "345678901234567",
-      "address":"0xF4d15Ad565796d69FD3D4CB66F7A3508136ab63f"
-    },
-    {
-      "sexe": "Femme",
-      "name": "Sophie Dubois",
-      "dateNaissance": "1985-11-30",
-      "numSecu": "456789012345678",
-      "address":"0x6CD9DF341B8Ca50e40605948Dd6aC8c880642670"
-    },
-    {
-      "sexe": "Homme",
-      "name": "Luc Leblanc",
-      "dateNaissance": "1995-07-25",
-      "numSecu": "567890123456789",
-      "address":""
-    }
 
-  ]
-  );
+
+  const [patients, setPatients] = useState([]);
   const [patient, setPatient] = useState({
     sexe: "",
     name: "",
     dateNaissance: "",
     numSecu: "",
-    address:""
+    address: ""
   })
 
   const [medicaments, setMedicaments] = useState<Medicament[]>([])
@@ -133,7 +97,7 @@ export default function Page() {
     }
   }
 
-  const handleSelectPatient = (value:any) => {
+  const handleSelectPatient = (value: any) => {
     console.log('Selected:', value);
     setPatient(value)
     // ici ajouter code pour recup addressPatient avec un filter sur data log 
@@ -141,48 +105,43 @@ export default function Page() {
   }
 
   const handleMint = async () => {
-    if(patient.name !== ""){
+    if (patient.name !== "") {
       let jsondata = {
         "patient": patient,
         "doctor": doctor,
         "medicaments": medicaments,
         "notes": ""
       }
-  
-      
+
+
 
       const result = await encryptApi(jsondata);
       await writeMintPrescription(addressPatient, result.encryptedData)
     } else {
       console.error("Aucun patient n'a été selectionné")
     }
-    
+
   }
 
   const getLogsPatients = async () => {
-    // getLogs("UserRegistered").then(async (data:any)=>{
-    //   console.log(data)
-    //   // let arrayFiltered = data.filter((row:any) => row.doctor === address);
-    //   // let arr:any = []
-    //   // arrayFiltered.map(async (item:any)=>{
-    //   //    let response = await decryptApi(item.encryptedDetails)
-    //   //    console.log(response)
-    //   //    arr.push(response);
 
-    //   //    item.encryptedDetails = response;
-
-    //   //    // arr rempli 
-    //   //    if(arr.length === arrayFiltered.length){
-          
-    //   //     console.log(arrayFiltered)
-
-
-    //   //     setbodyTable(arrayFiltered);
-    //   //    }
-    //   // })
-    //   // console.log(bodyTable);
-
-    // });
+    getLogs("UserRegistered", "Patient").then(async (datas: any) => {
+      let arr: any = []
+      for (const data of datas) {
+        console.log(data)
+        var decrypted = await decryptApi(data.encryptedDatas)
+        data.encryptedDatas = decrypted
+        arr.push({
+          "sexe": data.encryptedDatas.sexe,
+          "name":  data.encryptedDatas.name,
+          "dateNaissance": data.encryptedDatas.dateNaissance,
+          "numSecu": data.encryptedDatas.numSecu,
+          "address": data.user
+        });
+      }
+      setPatients(arr);
+      console.log(arr)
+    });
   }
 
   useEffect(() => {
@@ -230,7 +189,7 @@ export default function Page() {
                     </div>
                     <div className="flex items-center justify-between">
                       <dt className="text-muted-foreground">N° RPPS</dt>
-                      <dd>{doctor.name}</dd>
+                      <dd>{doctor.num_rpps}</dd>
                     </div>
 
                   </dl>
@@ -259,7 +218,7 @@ export default function Page() {
 
                   {patient.name !== "" ?
                     <dl className="grid gap-3">
-                      <Pencil2Icon 
+                      <Pencil2Icon
                         className="w-[40px] h-[40px] cursor-pointer absolute top-4 right-0 p-2"
                         onClick={() => setPatient({
                           sexe: "",
@@ -280,15 +239,15 @@ export default function Page() {
                     </dl>
                     :
                     <dl className="grid gap-3">
-                      
-                        <SearchInDatas
-                          data={patients}
-                          valueKey="name"
-                          textKey="name"
-                          mode="patient"
-                          onSelect={handleSelectPatient}
-                        />
-                      
+
+                      <SearchInDatas
+                        data={patients}
+                        valueKey="name"
+                        textKey="name"
+                        mode="patient"
+                        onSelect={handleSelectPatient}
+                      />
+
                     </dl>
                   }
 
@@ -350,7 +309,7 @@ export default function Page() {
             </Card>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end mb-8">
             <Button onClick={handleMint} disabled={patient.name === ""}>Générer l'ordonnance</Button>
           </div>
         </div>

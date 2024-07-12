@@ -74,71 +74,103 @@ import {
 import { useRouter } from 'next/navigation'
 
 import { getLogs } from "@/utils/logs"
-import { useEffect,useState } from "react"
+import { useEffect, useState } from "react"
 import { decryptApi } from "@/hooks/useContract"
 import moment from 'moment';
 import { useAccount } from "wagmi";
-
-
+import { useGetRole } from "@/hooks/useContract"
+import {BtnShowScan} from "@/components/shared/BtnShowScan"
 
 
 export default function Home() {
-  const [bodyTable, setbodyTable ] = useState([])
+  const [bodyTable, setbodyTable] = useState([])
   const { address } = useAccount();
+  const { role,isDoctor, isPatient, isPharmacist , loadingRole} = useGetRole();
 
 
   const datas = {
-    "headerTable":[
-    {"label":"N°", "className":""},
-    {"label":"Nom Patient", "className":""},
-    {"label":"Date de prescription", "className":""}
+    "headerTable": [
+      { "label": "N°", "className": "" },
+      { "label": "Date de prescription", "className": "" },
+      { "label": "Nom Patient", "className": "" },
+      { "label": "Ajouté par", "className": "" }
     ]
-   }
+  }
 
-   useEffect(() => {
-    getLogs("PrescriptionMinted").then(async (data:any)=>{
+  const fetchLogs = async ()=> {
+    await getLogs("PrescriptionMinted").then(async (data: any) => {
       console.log(data)
-      if(address){
-        let arrayFiltered = data.filter((row:any) => row.doctor === address);
-        let arr:any = []
-        arrayFiltered.map(async (item:any)=>{
-           let response = await decryptApi(item.encryptedDetails)
-           console.log(response)
-           arr.push(response);
+      if (address) {
+        console.log(address)
+        // Conditions du filter
+        let arrayFiltered:any = [];
+        console.log('isDoctor ', isDoctor);
+        if(isDoctor) {
+          arrayFiltered = data.filter((row: any) => row.doctor === address);
+        }
+        if(isPatient) {
+          arrayFiltered = data.filter((row: any) => row.patient === address);
+        }
+         
+        console.log(arrayFiltered)
+
+        //
+        let arr: any = []
+        if(arrayFiltered.length > 0) {
+          arrayFiltered.map(async (item: any) => {
+            let response = await decryptApi(item.encryptedDetails)
+            console.log(response)
+            arr.push(response);
   
-           item.encryptedDetails = response;
+            item.encryptedDetails = response;
   
-           // arr rempli 
-           if(arr.length === arrayFiltered.length){
-            
-            console.log(arrayFiltered)
+            // arr rempli 
+            if (arr.length === arrayFiltered.length) {
   
+              console.log('final array filtered : ',arrayFiltered)
   
-            setbodyTable(arrayFiltered);
-           }
-        })
+              const sortedArray = arrayFiltered.sort((a: any, b: any) => Number(a.date_created) - Number(b.date_created)).reverse();
+              console.log(sortedArray)
+              setbodyTable(sortedArray);
+            }
+          })
+        } else {
+          console.log('aucune prescription trouvée pour cet utilisateur')
+          setbodyTable([])
+        }
+        
         console.log(bodyTable);
       }
-     
-
     });
+  }
 
-    
-    
-   },[])
+  useEffect(()=>{
+    console.log(address)
+    if(address && !loadingRole) {
+      fetchLogs()
+      //console.log("fectch from address changed")
+    }
+  }, [address,role])
 
   return (
     <>
       <div className="mx-auto grid w-full max-w-[59rem] flex-1 auto-rows-max gap-4">
         <div className="flex items-center gap-4">
           <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-            Liste des ordonnances
+            {isPatient ? "Mes ordonnances" : "Liste des ordonnances"}
           </h1>
           <div className="hidden items-center gap-2 md:ml-auto md:flex">
 
-            <Button size="sm">
-              <Link href="/prescription/new">Nouvelle ordonnance</Link>
-            </Button>
+            {isDoctor &&
+              <Button size="sm">
+                <Link href="/prescription/new">Nouvelle ordonnance</Link>
+              </Button>
+            }
+
+            {isPharmacist &&
+              <BtnShowScan />
+            }
+
           </div>
         </div>
         <div className="grid gap-4  max-w-[59rem] lg:gap-8">
@@ -152,13 +184,13 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-              <TablePrescriptions
-                headerTable={datas.headerTable}
-                bodyTable={bodyTable}
-              />
+                <TablePrescriptions
+                  headerTable={datas.headerTable}
+                  bodyTable={bodyTable}
+                />
               </CardContent>
               <CardFooter className="justify-center border-t p-4">
-               
+
               </CardFooter>
             </Card>
 
@@ -167,7 +199,7 @@ export default function Home() {
 
           </div>
         </div>
-        
+
       </div>
     </>
   )
@@ -177,13 +209,13 @@ export default function Home() {
 
 
 export interface BodyTable {
-  tokenId:      string;
-  encryptedDetails:any;
-  date_created:    string;
+  tokenId: string;
+  encryptedDetails: any;
+  date_created: string;
 }
 
 export interface HeaderTable {
-  label:     string;
+  label: string;
   className: string;
 }
 
@@ -197,17 +229,18 @@ function TablePrescriptions({ headerTable, bodyTable }: TablePrescriptionsProps)
     <Table>
       <TableHeader>
         <TableRow>
-          {headerTable.map((row) =>{
+          {headerTable.map((row) => {
             return <TableHead key={row.label} className={row.className}>{row.label}</TableHead>
           })}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {bodyTable.map((row) =>{
-          return <TableRow key={crypto.randomUUID()}className="cursor-pointer" onClick={() => router.push('/prescription/' + row.tokenId)}>
+        {bodyTable.map((row) => {
+          return <TableRow key={crypto.randomUUID()} className="cursor-pointer" onClick={() => router.push('/prescription/' + row.tokenId)}>
             <TableCell>{row.tokenId.toString()}</TableCell>
+            <TableCell>{moment.unix(Number(row.date_created)).format("DD/MM/YYYY")}</TableCell>
             <TableCell>{row.encryptedDetails?.patient?.name}</TableCell>
-            <TableCell>{ moment.unix(Number(row.date_created)).format("MM/DD/YYYY")}</TableCell>
+            <TableCell>{row.encryptedDetails?.doctor?.name}</TableCell>
           </TableRow>
         })}
       </TableBody>

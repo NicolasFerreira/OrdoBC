@@ -12,7 +12,7 @@ module.exports = {
   networks: {
     // for testnet
     'base-sepolia': {
-      url: 'https://sepolia.base.org',
+      url: 'https://base-sepolia.g.alchemy.com/v2/tGme5Xxh6EqJy8KrDbt9-ZTb6pr-3wK3',
       accounts: [PRIVATE_KEY],
       gasPrice: 1000000000,
     },

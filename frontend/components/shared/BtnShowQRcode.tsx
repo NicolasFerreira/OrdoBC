@@ -19,11 +19,17 @@ interface BtnShowQRcodeProps {
 
 export function BtnShowQRcode({ id }: BtnShowQRcodeProps) {
     const [value, setValue] = useState("");
+    const [txt, setTxt] = useState("")
 
     useEffect(() => {
         console.log(id)
         setValue("/prescription/"+id+"?fromscan=true")
     },[])
+
+    const copylink = () => {
+        navigator.clipboard.writeText(value)
+        setTxt("Lien copié dans le presse-papier")
+    }
 
     return (
         <AlertDialog>
@@ -35,13 +41,14 @@ export function BtnShowQRcode({ id }: BtnShowQRcodeProps) {
                 <AlertDialogHeader>
                     
                     <AlertDialogDescription>
-                        <div style={{ height: "auto", margin: "0 auto", maxWidth: 250, width: "100%" }}>
+                        <div className="cursor-pointer" style={{ height: "auto", margin: "0 auto", maxWidth: 250, width: "100%" }} onClick={copylink}>
                             <QRCode
                                 size={256}
                                 style={{ height: "auto", maxWidth: "250px", width: "250px" }}
                                 value={value}
                                 viewBox={`0 0 256 256`}
                             />
+                            <div className="text-center text-gray-600 pt-4">{txt}</div>
                         </div>
                     </AlertDialogDescription>
                 </AlertDialogHeader>

@@ -138,10 +138,10 @@ contract Ordo is ERC721, Ownable {
             date_treated: 0,
             pharmacist: address(0)
         });
-
-        _safeMint(_to, tokenId);
         
         emit PrescriptionMinted(tokenId, msg.sender, _to, _encryptedDetails, block.timestamp);
+
+        _safeMint(_to, tokenId);
     }
 
     /**

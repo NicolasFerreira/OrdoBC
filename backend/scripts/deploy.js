@@ -37,6 +37,7 @@ async function main() {
   }
 
   if (networkName === "base-sepolia") {
+    await Ordo.setBaseURI("https://ipfs.io/ipfs/QmWpKMVKmH2Que7bNu7bbhzqXF5DpzUzz1KR12vwVhLk56/")
 
     const users = [
       { address: "0x520Aae94Da19a41eb6feD3994b6421b0e33bA83c", role: 1, data: "U2FsdGVkX18/oaPf6eggDoTB37NUkSeMCPePb+tw7Y0GM9i9A94LfVzSEU4k2Z4UgQD1b6V/Dqb4Y9KnA9y4ePxojxweOTqxBpmgNRaD17ASwyJ9DWGACnmQgfFfhh4HUA5NPsgIRkQCw13reQOMJhX6oFOTMSkYtQ6OVlaSTm0cljgsh+LWvSHx9LOzM/be4i0T4tqc2UjeQ6tZPyBtPA==", message: "Doctor registered:" },

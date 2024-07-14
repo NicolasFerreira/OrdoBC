@@ -17,7 +17,7 @@ error SoulboundTransferFailed();
 
 contract Ordo is ERC721, Ownable {
     uint256 private _tokenIdCounter;
-
+    string private _baseTokenURI;
     // Mapping to store users
     mapping(address => User) public users;
 
@@ -176,8 +176,16 @@ contract Ordo is ERC721, Ownable {
      * @dev Sets the base URI for the NFTs.
      * @return The base URI as a string.
      */
-    function _baseURI() internal pure override returns (string memory) {
-        return "https://ipfs.io/ipfs/QmWpKMVKmH2Que7bNu7bbhzqXF5DpzUzz1KR12vwVhLk56/";
+    function _baseURI() internal view override returns (string memory) {
+        return _baseTokenURI;
+    }
+
+    /**
+     * @dev Sets the base URI for the token metadata.
+     * @param baseURI The base URI to set.
+     */
+    function setBaseURI(string memory baseURI) external onlyOwner {
+        _baseTokenURI = baseURI;
     }
 
     /**
@@ -208,5 +216,15 @@ contract Ordo is ERC721, Ownable {
         }
 
         return super._update(to, tokenId, auth);
+    }
+
+    /**
+     * @dev Returns the URI for a given token ID.
+     * @param _tokenId The token ID.
+     * @return The token URI.
+     */
+    function tokenURI(uint256 _tokenId) public view override checkTokenExists(_tokenId) returns (string memory) {
+        // Return the base URI for all tokens
+        return _baseTokenURI;
     }
 }

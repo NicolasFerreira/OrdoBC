@@ -1,10 +1,8 @@
 'use client'
 import { useState, useEffect, useContext, use } from "react";
 import { redirect } from 'next/navigation';
-import Link from "next/link"
 import { useGetRole, useMintPrescription, encryptApi, decryptApi, useGetUserInfos } from "@/hooks/useContract";
-import { Prescription } from "@/types/ordoTypes";
-
+import { ReloadIcon } from "@radix-ui/react-icons"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,38 +15,18 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@/components/ui/toggle-group"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider
-} from "@/components/ui/tooltip"
-import {
 
   PlusCircle,
   Trash
 } from "lucide-react"
 import { Label } from "@/components/ui/label";
 import { BtnModalMedic } from "@/components/shared/BtnModalMedic";
-import { publicClient } from "@/utils/client";
-import { contractAddress } from "@/constants";
-import { Console } from "console";
 import moment from "moment";
 import { SearchInDatas } from "@/components/shared/SearhInDatas";
 import { Pencil2Icon } from '@radix-ui/react-icons'
 import { getLogs } from "@/utils/logs"
+import { useToast } from "@/components/ui/use-toast"
+import { useRouter } from 'next/navigation'
 
 interface Medicament {
   name: string;
@@ -60,7 +38,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [addressPatient, setAddressPatient] = useState("");
   const { loadingRole, isRegistered, isDoctor, isPatient, isPharmacist } = useGetRole();
-  const { writeMintPrescription, isConfirmedMint } = useMintPrescription();
+  const { writeMintPrescription, isConfirmedMint, isPendingMint, errorConfirmationMint, errorMint } = useMintPrescription();
   const { dataUser } = useGetUserInfos();
   const [doctor, setDoctor] = useState({
     lieu: "",
@@ -68,8 +46,6 @@ export default function Page() {
     num_rpps: "",
     specialite: ""
   })
-
-
   const [patients, setPatients] = useState([]);
   const [patient, setPatient] = useState({
     sexe: "",
@@ -78,8 +54,9 @@ export default function Page() {
     numSecu: "",
     address: ""
   })
-
-  const [medicaments, setMedicaments] = useState<Medicament[]>([])
+  const [medicaments, setMedicaments] = useState<Medicament[]>([]);
+  const { toast } = useToast();
+  const router = useRouter()
 
   const handleAddMedicament = (name: string, posology: string) => {
     const newMedicament = { name: name, posology: posology }
@@ -112,9 +89,6 @@ export default function Page() {
         "medicaments": medicaments,
         "notes": ""
       }
-
-
-
       const result = await encryptApi(jsondata);
       await writeMintPrescription(addressPatient, result.encryptedData)
     } else {
@@ -146,9 +120,24 @@ export default function Page() {
 
   useEffect(() => {
     if (isConfirmedMint) {
-      redirect("/")
+      toast({
+        description: "Ordonnance créée avec succès !",
+      })
+      router.push("/")
     }
-  }, [isConfirmedMint])
+    if (errorConfirmationMint) {
+      toast({
+        variant: "destructive",
+        description: "Une erreur est survenue lors de la création de l'ordonnance",
+      })
+    }
+    if (errorMint) {
+      toast({
+        variant: "destructive",
+        description: "Une erreur est survenue lors de la récupération de l'ordonnance",
+      })
+    }
+  }, [isConfirmedMint,errorConfirmationMint, errorMint])
 
   useEffect(() => {
     if (dataUser) {
@@ -310,7 +299,12 @@ export default function Page() {
           </div>
 
           <div className="flex justify-end mb-8">
-            <Button onClick={handleMint} disabled={patient.name === ""}>Générer l'ordonnance</Button>
+            <Button onClick={handleMint} disabled={patient.name === "" || isPendingMint}>
+              {isPendingMint &&
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              }
+              Générer l'ordonnance
+            </Button>
           </div>
         </div>
 

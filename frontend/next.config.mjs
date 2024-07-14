@@ -9,7 +9,7 @@ const nextConfig = {
     APP_URL: process.env.APP_URL,
     CLOUD_WALLET_KEY: process.env.CLOUD_WALLET_KEY,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
-    CONTRACT_ADDRESS_PROD: process.env.CONTRACT_ADDRESS_PR
+    CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS
   },
   reactStrictMode: false,
   images: {

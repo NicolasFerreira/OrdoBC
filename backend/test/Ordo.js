@@ -167,6 +167,13 @@ describe("Ordo", function () {
                     .to.be.revertedWithCustomError(this.ordo, "NotPharmacist");
             });
 
+            it("should fail if prescription is already mark as treated", async function () {
+                await expect(this.ordo.connect(this.addr2).markAsTreated(1))
+
+                await expect(this.ordo.connect(this.addr2).markAsTreated(1))
+                    .to.be.revertedWithCustomError(this.ordo, "PrescriptionAlreadyTreated");
+            });
+
             it("should fail if token does not exist", async function () {
                 await expect(this.ordo.connect(this.addr2).markAsTreated(2))
                     .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");

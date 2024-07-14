@@ -4,7 +4,7 @@ const { vars } = require("hardhat/config");
 const fakeDatasForCi = "0x0123456789012345678901234567890123456789012345678901234567890123"
 const PRIVATE_KEY = vars.get("PRIVATE_KEY",fakeDatasForCi);
 const BASESCAN_API_KEY = vars.get("BASESCAN_API_KEY",fakeDatasForCi);
-
+const ALCHEMY_KEY = vars.get("ALCHEMY_KEY",fakeDatasForCi);
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
   networks: {
     // for testnet
     'base-sepolia': {
-      url: 'https://base-sepolia.g.alchemy.com/v2/tGme5Xxh6EqJy8KrDbt9-ZTb6pr-3wK3',
+      url: 'https://base-sepolia.g.alchemy.com/v2/' + ALCHEMY_KEY,
       accounts: [PRIVATE_KEY],
       gasPrice: 1000000000,
     },

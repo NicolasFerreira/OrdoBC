@@ -98,50 +98,76 @@ export default function Home() {
   }
 
   const fetchLogs = async ()=> {
-    await getLogs("PrescriptionMinted").then(async (data: any) => {
-      console.log(data)
-      if (address) {
-        console.log(address)
-        // Conditions du filter
-        let arrayFiltered:any = [];
-        console.log('isDoctor ', isDoctor);
-        if(isDoctor) {
-          arrayFiltered = data.filter((row: any) => row.doctor === address);
-        }
-        if(isPatient) {
-          arrayFiltered = data.filter((row: any) => row.patient === address);
-        }
-         
-        console.log(arrayFiltered)
+    if(isPharmacist) {
+      await getLogs("PrescriptionTreated",address).then(async (data: any) => {
+        console.log(data)
+        var arrayTreaded = data;
 
-        //
-        let arr: any = []
-        if(arrayFiltered.length > 0) {
-          arrayFiltered.map(async (item: any) => {
-            let response = await decryptApi(item.encryptedDetails)
-            console.log(response)
-            arr.push(response);
-  
-            item.encryptedDetails = response;
-  
-            // arr rempli 
-            if (arr.length === arrayFiltered.length) {
-  
-              console.log('final array filtered : ',arrayFiltered)
-  
-              const sortedArray = arrayFiltered.sort((a: any, b: any) => Number(a.date_created) - Number(b.date_created)).reverse();
-              console.log(sortedArray)
-              setbodyTable(sortedArray);
-            }
+        await getLogs("PrescriptionMinted").then(async (dataMinted: any) => {
+
+          var arrayMinted = dataMinted
+
+          var finalArray:any = [];
+
+          arrayTreaded.forEach((item: any) => {
+
+            arrayMinted.forEach((element:any) => {
+                if(item.tokenId === element.tokenId){
+                  finalArray.push(element);
+                }
+            });
           })
-        } else {
-          console.log('aucune prescription trouvée pour cet utilisateur')
-          setbodyTable([])
+
+          setbodyTable(finalArray);
+        })
+      });
+    } else {
+      await getLogs("PrescriptionMinted").then(async (data: any) => {
+        console.log(data)
+        if (address) {
+          console.log(address)
+          // Conditions du filter
+          let arrayFiltered:any = [];
+          console.log('isDoctor ', isDoctor);
+          if(isDoctor) {
+            arrayFiltered = data.filter((row: any) => row.doctor === address);
+          }
+          if(isPatient) {
+            arrayFiltered = data.filter((row: any) => row.patient === address);
+          }
+           
+          console.log(arrayFiltered)
+  
+          //
+          let arr: any = []
+          if(arrayFiltered.length > 0) {
+            arrayFiltered.map(async (item: any) => {
+              let response = await decryptApi(item.encryptedDetails)
+              console.log(response)
+              arr.push(response);
+    
+              item.encryptedDetails = response;
+    
+              // arr rempli 
+              if (arr.length === arrayFiltered.length) {
+    
+                console.log('final array filtered : ',arrayFiltered)
+    
+                const sortedArray = arrayFiltered.sort((a: any, b: any) => Number(a.date_created) - Number(b.date_created)).reverse();
+                console.log(sortedArray)
+                setbodyTable(sortedArray);
+              }
+            })
+          } else {
+            console.log('aucune prescription trouvée pour cet utilisateur')
+            setbodyTable([])
+          }
+          
+          console.log(bodyTable);
         }
-        
-        console.log(bodyTable);
-      }
-    });
+      });
+    }
+   
   }
 
   useEffect(()=>{
@@ -236,7 +262,7 @@ function TablePrescriptions({ headerTable, bodyTable }: TablePrescriptionsProps)
       </TableHeader>
       <TableBody>
         {bodyTable.map((row) => {
-          return <TableRow key={crypto.randomUUID()} className="cursor-pointer" onClick={() => router.push('/prescription/' + row.tokenId)}>
+          return <TableRow key={crypto.randomUUID()} className="cursor-pointer" onClick={() => router.push('/prescription/' + row.tokenId+"?f=l")}>
             <TableCell>{row.tokenId.toString()}</TableCell>
             <TableCell>{moment.unix(Number(row.date_created)).format("DD/MM/YYYY")}</TableCell>
             <TableCell>{row.encryptedDetails?.patient?.name}</TableCell>

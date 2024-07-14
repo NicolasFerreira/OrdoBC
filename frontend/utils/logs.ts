@@ -7,7 +7,7 @@ import { contractAbi, contractAddress } from "@/constants"
 
 
 
-export async function getLogs(eventName: string, filter?: string) {
+export async function getLogs(eventName: string, filterString?: string) {
   let event: ParseAbiItem<string>;
 
   switch (eventName) {
@@ -34,14 +34,25 @@ export async function getLogs(eventName: string, filter?: string) {
 
   var logs: any[] = []
 
-  if (filter) {
+  if (filterString) {
+    switch (filterString) {
+      case "Patient":
+        args = { role:3 }
+        break;
+      default:
+        break;
+    }
+
+    if(eventName==="PrescriptionTreated"){
+      args = { pharmacist: filterString }
+    }
 
     const filter = await publicClient.createEventFilter({
       address: contractAddress,
       event: event,
       fromBlock: deploymentBlockNumber,
       toBlock: "latest",
-      args: { role:3 }
+      args: args
     })
 
     logs = await publicClient.getFilterLogs({ filter })

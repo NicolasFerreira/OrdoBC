@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
+import { decryptApi } from "@/hooks/useContract";
 
 export function BtnShowScan() {
     const [value, setValue] = useState("");
@@ -24,12 +25,13 @@ export function BtnShowScan() {
         setValue(event.target.value);
     }
 
-    const handleKeyDown = (event:any) => {
-        if (event.key === 'Enter') {
+    const handleKeyDown = async (event:any) => {
+        if (event.key === 'Enter') {     
             setError("")
-          if(value.startsWith("/prescription/") && value.includes("fromScan=true")){
-            console.log(value)
-            router.push(value)
+            let result = await decryptApi(value);
+          if(result.startsWith("/prescription/") && result.includes("fromScan=true")){
+            console.log(result)
+            router.push(result)
           } else {
             setValue("");
             setError("Une erreur est survenue, réessayez.")

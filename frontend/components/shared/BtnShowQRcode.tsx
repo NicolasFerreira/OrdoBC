@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import QRCode from "react-qr-code";
 import { useEffect, useState } from "react";
+import { encryptApi } from "@/hooks/useContract";
 
 interface BtnShowQRcodeProps {
     id:number;
@@ -21,9 +22,16 @@ export function BtnShowQRcode({ id }: BtnShowQRcodeProps) {
     const [value, setValue] = useState("");
     const [txt, setTxt] = useState("")
 
+    const getValue = async () => {
+        let result = await encryptApi("/prescription/"+id+"?fromScan=true")
+        console.log(result.encryptedData)
+        setValue(result.encryptedData)
+    }
+
     useEffect(() => {
         console.log(id)
-        setValue("/prescription/"+id+"?fromscan=true")
+        getValue()
+        
     },[])
 
     const copylink = () => {

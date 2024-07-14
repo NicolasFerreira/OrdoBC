@@ -202,6 +202,7 @@ export function useMintPrescription() {
 }
 
 export function useMarkAsTreated() {
+  const { address } = useAccount();
   const { data: fetchedDataMark, error: errorMark, isPending: isPendingMark, writeContract: writeMark } = useWriteContract({});
 
   async function writeMarkAsTreated(idPrescription: number) {
@@ -215,6 +216,7 @@ export function useMarkAsTreated() {
     await writeMark({
       address: contractAddress,
       abi: contractAbi,
+      account: address,
       functionName: "markAsTreated",
       args: [Number(idPrescription)]
     });
@@ -228,11 +230,11 @@ export function useMarkAsTreated() {
 
   useEffect(() => {
     if (isConfirmedMark) {
-      console.log('Prescription bien créée');
+      console.log('Prescription traitée');
       console.log(fetchedDataMark)
     }
     if (errorConfirmationMark) {
-      console.log('Une erreur est survenue lors de la création de la prescription');
+      console.log('Une erreur est survenue lors du markAsTreated');
     }
     if (errorMark) {
       console.log(errorMark.message);

@@ -1,5 +1,8 @@
-export const contractAddress = process.env.CONTRACT_ADDRESS
+// Define the type for the contract address
+type EthereumAddress = `0x${string}`;
 
+// Get the contract address from the environment variable or use a default value
+export const contractAddress: EthereumAddress = (process.env.CONTRACT_ADDRESS as EthereumAddress) || "0x0123456789012345678901234567890123456789";
 export const contractAbi = [
 	{
 		"inputs": [],

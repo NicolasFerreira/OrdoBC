@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Prescription } from "@/types/ordoTypes";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { useToast } from "@/components/ui/use-toast"
+import { useSearchParams, useRouter } from 'next/navigation'
 
 export default function Page({ params }: { params: { id: number } }) {
   const { dataPrescription, refetchPrescription } = useGetPrescription(params.id);
@@ -28,6 +29,11 @@ export default function Page({ params }: { params: { id: number } }) {
   const { isPatient, isPharmacist } = useGetRole();
   const [isTreated, setIsTreated] = useState(false);
   const { toast } = useToast();
+  const searchParams = useSearchParams()
+  const fromScan = searchParams.get('fromScan')
+  const f = searchParams.get('f')
+  const router = useRouter()
+
 
   useEffect(() => {
     if (dataPrescription !== null) {
@@ -36,6 +42,12 @@ export default function Page({ params }: { params: { id: number } }) {
       setIsTreated(dataPrescription.treated);
     }
   }, [dataPrescription]);
+
+  useEffect(() => {
+    if (!fromScan && isPharmacist && f !=="l") {
+      router.push("/");
+    }
+  }, [fromScan, isPharmacist]);
 
   /**
    * Marque la prescription comme traitée.

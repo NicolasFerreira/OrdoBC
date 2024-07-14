@@ -213,6 +213,25 @@ describe("Ordo", function () {
                     .to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
             });
         })
+
+        describe("URI Functions", function () {
+            beforeEach(async function () {
+                Object.assign(this, await fixtureWithUsers(fixture));
+            });
+    
+            it("should return the correct token URI", async function () {
+                await this.ordo.setBaseURI("https://ipfs.io/ipfs/");
+                await this.ordo.connect(this.addr1).mintPrescription(this.addr3.address, encryptedDetails);
+                const tokenURI = await this.ordo.tokenURI(1);
+                expect(tokenURI).to.equal("https://ipfs.io/ipfs/");
+            });
+    
+            it("should revert token URI if token does not exist", async function () {
+                await this.ordo.setBaseURI("https://ipfs.io/ipfs/");
+                await expect(this.ordo.tokenURI(1)).to.be.revertedWithCustomError(this.ordo, "ERC721NonexistentToken");
+            });
+        });
+    
     })
 
 });
